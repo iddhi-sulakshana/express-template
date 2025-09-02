@@ -1,0 +1,191 @@
+openapi: 3.0.0
+info:
+  title: Health Check
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      summary: Check the health of the server
+      description: Returns comprehensive health information including server status, memory usage, CPU usage, and database connectivity
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Server is healthy and running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    description: HTTP status code
+                    example: 200
+                  message:
+                    type: string
+                    description: Response message
+                    example: 'Server is running'
+                  data:
+                    type: object
+                    description: Comprehensive health check data
+                    properties:
+                      status:
+                        type: string
+                        description: Overall health status of the server
+                        enum: ['OK', 'DEGRADED', 'ERROR']
+                        example: 'OK'
+                      message:
+                        type: string
+                        description: Health status message
+                        example: 'Server is running'
+                      timestamp:
+                        type: string
+                        format: date-time
+                        description: ISO timestamp when health check was performed
+                        example: '2025-08-16T14:56:41.019Z'
+                      uptime:
+                        type: number
+                        format: float
+                        description: Server uptime in seconds
+                        example: 8.251002827
+                      memoryUsage:
+                        type: object
+                        description: Server memory usage statistics
+                        properties:
+                          totalMemory:
+                            type: integer
+                            format: int64
+                            description: Total system memory in bytes
+                            example: 8054558720
+                          freeMemory:
+                            type: integer
+                            format: int64
+                            description: Available free memory in bytes
+                            example: 295821312
+                          usedMemory:
+                            type: integer
+                            format: int64
+                            description: Used memory in bytes (calculated as total - free)
+                            example: 7758737408
+                        required:
+                          - totalMemory
+                          - freeMemory
+                          - usedMemory
+                      cpuUsage:
+                        type: object
+                        description: CPU usage statistics in microseconds
+                        properties:
+                          user:
+                            type: integer
+                            format: int64
+                            description: CPU time spent in user mode (microseconds)
+                            example: 2612318
+                          system:
+                            type: integer
+                            format: int64
+                            description: CPU time spent in system mode (microseconds)
+                            example: 1054094
+                        required:
+                          - user
+                          - system
+                      dependencies:
+                        type: object
+                        description: Status of external dependencies and services
+                        example: {}
+                        additionalProperties: true
+                      database:
+                        type: object
+                        description: Database connectivity and health status
+                        properties:
+                          status:
+                            type: string
+                            description: Database connection status
+                            enum: ['OK', 'ERROR', 'CONNECTING']
+                            example: 'OK'
+                          message:
+                            type: string
+                            description: Database status message
+                            example: 'Database is running'
+                        required:
+                          - status
+                          - message
+                    required:
+                      - status
+                      - message
+                      - timestamp
+                      - uptime
+                      - memoryUsage
+                      - cpuUsage
+                      - dependencies
+                      - database
+                required:
+                  - status
+                  - message
+                  - data
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    description: HTTP status code
+                    example: 500
+                  message:
+                    type: string
+                    description: Error message
+                    example: 'Internal server error'
+                  data:
+                    type: object
+                    nullable: true
+                    description: Error data (may be null)
+                    example: null
+                required:
+                  - status
+                  - message
+        '503':
+          description: Service Unavailable - Database or critical dependencies are down
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    description: HTTP status code
+                    example: 503
+                  message:
+                    type: string
+                    description: Service unavailable message
+                    example: 'Service temporarily unavailable'
+                  data:
+                    type: object
+                    description: Partial health data showing what's available
+                    properties:
+                      status:
+                        type: string
+                        enum: ['DEGRADED', 'ERROR']
+                        example: 'ERROR'
+                      message:
+                        type: string
+                        example: 'Database connection failed'
+                      timestamp:
+                        type: string
+                        format: date-time
+                        example: '2025-08-16T14:56:41.019Z'
+                      database:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            enum: ['ERROR', 'CONNECTING']
+                            example: 'ERROR'
+                          message:
+                            type: string
+                            example: 'Connection timeout'
+                required:
+                  - status
+                  - message
+                  - data

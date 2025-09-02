@@ -1,0 +1,281 @@
+paths:
+  /auth/signin/email:
+    post:
+      tags:
+        - Authentication
+      summary: Sign in with email and password
+      description: |
+        Authenticate a user using their email and password credentials.
+        Generates both access token and refresh token for secure authentication.
+
+        **Security Features**:
+        - Password verification using secure hashing
+        - User status validation (only ACTIVE users can sign in)
+        - JWT tokens with proper expiration
+        - Refresh token for secure token renewal
+      operationId: emailSignin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                  example: 'customer@example.com'
+                password:
+                  type: string
+                  minLength: 1
+                  description: User's password
+                  example: '12345678'
+      responses:
+        '200':
+          description: User signed in successfully with token pair
+          headers:
+            x-access-token:
+              description: JWT access token for API authentication
+              schema:
+                type: string
+              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyM2U0NTY3LWU4OWItMTJkMy1hNDU2LTQyNjYxNDE3NDAwMCIsInVzZXJUeXBlIjoiQ1VTVE9NRVIiLCJ1c2VyU3RhdHVzIjoiQUNUSVZFIiwiaWF0IjoxNzM0NTY3ODkwLCJleHAiOjE3MzQ2NzQyOTB9.accessToken'
+            x-refresh-token:
+              description: JWT refresh token for token renewal and rotation
+              schema:
+                type: string
+              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyM2U0NTY3LWU4OWItMTJkMy1hNDU2LTQyNjYxNDE3NDAwMCIsInNpZCI6InNlc3Npb25faWQiLCJyaWQiOiJyZWZyZXNoX2lkIiwicm90IjowLCJpYXQiOjE3MzQ1Njc4OTAsImV4cCI6MTczNDY3NDI5MH0.refreshToken'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 'User signed in successfully'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        description: Unique user identifier
+                        example: '123e4567-e89b-12d3-a456-426614174000'
+                      email:
+                        type: string
+                        format: email
+                        description: User's email address
+                        example: 'customer@example.com'
+                      userType:
+                        type: string
+                        enum: [CUSTOMER, VENDOR, EMPLOYEE, SUPER_ADMIN]
+                        description: Type of user account
+                        example: 'CUSTOMER'
+                      userStatus:
+                        type: string
+                        enum: [ACTIVE, INACTIVE, SUSPENDED, DELETED, PENDING]
+                        description: Current status of the user account
+                        example: 'ACTIVE'
+        '400':
+          description: Bad request - Invalid credentials or user status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Invalid password'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'User not found'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: 'Validation error'
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        path:
+                          type: string
+                          description: Field path with validation error
+                          example: 'email'
+                        message:
+                          type: string
+                          description: Validation error message
+                          example: 'Invalid email format'
+                        code:
+                          type: string
+                          description: Validation error code
+                          example: 'invalid_string'
+
+  /auth/signin/mobile:
+    post:
+      tags:
+        - Authentication
+      summary: Sign in with mobile number
+      description: Authenticate a user using their mobile number (Not implemented yet)
+      operationId: mobileSignin
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Mobile signin parameters (to be implemented)
+      responses:
+        '501':
+          description: Not implemented
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 501
+                  message:
+                    type: string
+                    example: 'Not Implemented'
+
+  /auth/signin/google:
+    post:
+      tags:
+        - Authentication
+      summary: Sign in with Google OAuth
+      description: Authenticate a user using Google OAuth (Not implemented yet)
+      operationId: googleSignin
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Google OAuth parameters (to be implemented)
+      responses:
+        '501':
+          description: Not implemented
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 501
+                  message:
+                    type: string
+                    example: 'Not Implemented'
+
+components:
+  schemas:
+    UserType:
+      type: string
+      enum: [CUSTOMER, VENDOR, EMPLOYEE, SUPER_ADMIN]
+      description: Available user types in the system
+
+    UserStatus:
+      type: string
+      enum: [ACTIVE, INACTIVE, SUSPENDED, DELETED, PENDING]
+      description: Available user statuses in the system
+
+    EmailSigninRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User's email address
+        password:
+          type: string
+          minLength: 1
+          description: User's password
+
+    EmailSigninResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique user identifier
+        email:
+          type: string
+          format: email
+          description: User's email address
+        userType:
+          $ref: '#/components/schemas/UserType'
+        userStatus:
+          $ref: '#/components/schemas/UserStatus'
+
+    ApiResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: HTTP status code
+        message:
+          type: string
+          description: Response message
+        data:
+          description: Response data (varies by endpoint)
+
+    ValidationError:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 422
+        message:
+          type: string
+          example: 'Validation error'
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+                description: Field path with validation error
+              message:
+                type: string
+                description: Validation error message
+              code:
+                type: string
+                description: Validation error code
+
+tags:
+  - name: Authentication
+    description: User authentication and signin operations

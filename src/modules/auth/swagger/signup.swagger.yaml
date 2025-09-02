@@ -1,0 +1,287 @@
+paths:
+  /auth/signup/email:
+    post:
+      tags:
+        - Authentication
+      summary: Email Signup
+      description: Register a new user using email and password
+      operationId: emailSignup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailSignupRequest'
+            examples:
+              customer_signup:
+                summary: Customer Registration
+                value:
+                  email: 'customer@example.com'
+                  password: '12345678'
+                  name: 'John Doe'
+                  userType: 'CUSTOMER'
+              vendor_signup:
+                summary: Vendor Registration
+                value:
+                  email: 'vendor@example.com'
+                  password: '12345678'
+                  name: 'ABC Salon'
+                  userType: 'VENDOR'
+              employee_signup:
+                summary: Employee Registration
+                value:
+                  email: 'employee@example.com'
+                  password: '12345678'
+                  name: 'Jane Smith'
+                  userType: 'EMPLOYEE'
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              examples:
+                success_response:
+                  summary: Successful Registration
+                  value:
+                    message: 'Email signup successful'
+                    status: 200
+                    data: {}
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              examples:
+                validation_error:
+                  summary: Validation Error
+                  value:
+                    message: 'Validation failed'
+                    status: 400
+                    data:
+                      email: ['Invalid email format']
+                      password: ['Password must be at least 8 characters']
+                      name: ['Name must be at least 3 characters']
+                      userType: ['Invalid user type']
+        '409':
+          description: Conflict - user already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+              examples:
+                user_exists:
+                  summary: User Already Exists
+                  value:
+                    message: 'User with this email already exists'
+                    status: 409
+                    data: {}
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntityError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /auth/signup/mobile:
+    post:
+      tags:
+        - Authentication
+      summary: Mobile Signup
+      description: Register a new user using mobile number (Not Implemented)
+      operationId: mobileSignup
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Mobile signup not implemented yet
+      responses:
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotImplementedError'
+              examples:
+                not_implemented:
+                  summary: Not Implemented
+                  value:
+                    message: 'Not Implemented'
+                    status: 501
+                    data: {}
+
+  /auth/signup/google:
+    post:
+      tags:
+        - Authentication
+      summary: Google OAuth Signup
+      description: Register a new user using Google OAuth (Not Implemented)
+      operationId: googleSignup
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Google signup not implemented yet
+      responses:
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotImplementedError'
+              examples:
+                not_implemented:
+                  summary: Not Implemented
+                  value:
+                    message: 'Not Implemented'
+                    status: 501
+                    data: {}
+
+components:
+  schemas:
+    EmailSignupRequest:
+      type: object
+      required:
+        - email
+        - password
+        - name
+        - userType
+      properties:
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: 'user@example.com'
+          maxLength: 255
+        password:
+          type: string
+          description: User's password (minimum 8 characters)
+          minLength: 8
+          example: 'securePassword123'
+        name:
+          type: string
+          description: User's full name (minimum 3 characters)
+          minLength: 3
+          example: 'John Doe'
+        userType:
+          type: string
+          enum: [CUSTOMER, VENDOR, EMPLOYEE, SUPER_ADMIN]
+          description: Type of user account
+          example: 'CUSTOMER'
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Success message
+          example: 'Email signup successful'
+        status:
+          type: integer
+          description: HTTP status code
+          example: 200
+        data:
+          type: object
+          description: Response data (currently empty for signup)
+
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: 'Validation failed'
+        status:
+          type: integer
+          description: HTTP status code
+          example: 400
+        data:
+          type: object
+          description: Validation error details
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+    ConflictError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: 'User with this email already exists'
+        status:
+          type: integer
+          description: HTTP status code
+          example: 409
+        data:
+          type: object
+          description: Error details
+
+    UnprocessableEntityError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: 'Unprocessable Entity'
+        status:
+          type: integer
+          description: HTTP status code
+          example: 422
+        data:
+          type: object
+          description: Error details
+
+    NotImplementedError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: 'Not Implemented'
+        status:
+          type: integer
+          description: HTTP status code
+          example: 501
+        data:
+          type: object
+          description: Error details
+
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: 'Internal Server Error'
+        status:
+          type: integer
+          description: HTTP status code
+          example: 500
+        data:
+          type: object
+          description: Error details
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authenticated requests
+
+tags:
+  - name: Authentication
+    description: User authentication and registration endpoints

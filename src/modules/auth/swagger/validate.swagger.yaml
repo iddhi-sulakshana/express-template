@@ -1,0 +1,177 @@
+paths:
+  /auth/validate:
+    get:
+      tags:
+        - Authentication
+      summary: Validate user authentication and retrieve user details
+      description: |
+        Validates the current user's authentication token and returns their profile information.
+        This endpoint requires a valid JWT access token in the Authorization header.
+
+        **Authentication Required**:
+        - Valid JWT access token in Authorization header
+        - User must be in ACTIVE status
+        - Token must not be expired
+
+        **Use Cases**:
+        - Verify user authentication status
+        - Get current user profile information
+        - Check user permissions and status
+      operationId: validateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          description: |
+            Bearer token containing the access token.
+            Format: `<access_token>`
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User validated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 'User validated successfully'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        description: Unique user identifier
+                        example: '123e4567-e89b-12d3-a456-426614174000'
+                      email:
+                        type: string
+                        format: email
+                        description: User's email address
+                        example: 'user@example.com'
+                      userType:
+                        type: string
+                        enum: [CUSTOMER, VENDOR, EMPLOYEE, SUPER_ADMIN]
+                        description: Type of user account
+                        example: 'CUSTOMER'
+                      userStatus:
+                        type: string
+                        enum: [ACTIVE, INACTIVE, SUSPENDED, DELETED, PENDING]
+                        description: Current status of the user account
+                        example: 'ACTIVE'
+              examples:
+                success_response:
+                  summary: Successful user validation
+                  value:
+                    status: 200
+                    message: 'User validated successfully'
+                    data:
+                      id: '123e4567-e89b-12d3-a456-426614174000'
+                      email: 'user@example.com'
+                      userType: 'CUSTOMER'
+                      userStatus: 'ACTIVE'
+        '401':
+          description: Unauthorized - Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+              examples:
+                invalid_token:
+                  summary: Invalid or expired token
+                  value:
+                    status: 401
+                    message: 'Access denied: No token provided'
+                expired_token:
+                  summary: Expired token
+                  value:
+                    status: 401
+                    message: 'Token expired: token rotation required'
+        '403':
+          description: Forbidden - User does not have required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+              examples:
+                insufficient_permissions:
+                  summary: Insufficient permissions
+                  value:
+                    status: 403
+                    message: 'Access denied: User does not have the required permissions'
+        '404':
+          description: User not found or user account not active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+              examples:
+                user_not_found:
+                  summary: User not found or inactive
+                  value:
+                    status: 404
+                    message: 'User not found'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+              examples:
+                server_error:
+                  summary: Internal server error
+                  value:
+                    status: 500
+                    message: 'Uncaught Error'
+
+components:
+  schemas:
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 401
+        message:
+          type: string
+          example: 'Access denied: No token provided'
+
+    ForbiddenError:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 403
+        message:
+          type: string
+          example: 'Access denied: User does not have the required permissions'
+
+    NotFoundError:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 404
+        message:
+          type: string
+          example: 'User not found'
+
+    InternalServerError:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 500
+        message:
+          type: string
+          example: 'Uncaught Error'
+
+tags:
+  - name: Authentication
+    description: User authentication validation and profile retrieval operations

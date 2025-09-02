@@ -1,0 +1,47 @@
+services:
+  # Backend with Bun (recommended for performance)
+  backend-bun:
+    build:
+      context: .
+      # Uncomment this line to use pnpm instead of bun
+      dockerfile: Dockerfile.pnpm
+      # dockerfile: Dockerfile.bun
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:12345@dev-db:5432/express-template-local
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.bun
+    depends_on:
+      - dev-db
+      - redis
+    restart: unless-stopped
+
+  dev-db:
+    image: postgis/postgis:13-3.1
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: express-template-local
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
