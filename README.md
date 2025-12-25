@@ -30,4 +30,4 @@ All source code for the application is organized within the `src` folder. Docume
 
 ## 📄 License
 
-MIT
+[MIT](./LICENSE)
