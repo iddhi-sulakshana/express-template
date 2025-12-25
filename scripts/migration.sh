@@ -13,6 +13,11 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 LOCAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# if local dir is inside scripts remove the scripts part from LOCAL_DIR
+if [[ $LOCAL_DIR == *"scripts"* ]]; then
+    LOCAL_DIR="${LOCAL_DIR%/*}"
+fi
+
 # Function to print colored output
 print_status() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -72,7 +77,6 @@ generate_migrations() {
 
 # Function to generate migration files in container
 generate_migrations_in_container() {
-    cd $LOCAL_DIR/../docker
     print_status "Generating migration files in container..."
 
     docker compose exec backend bun run db:generate
@@ -82,7 +86,6 @@ generate_migrations_in_container() {
 
 # Function to run migrations in container
 run_migrations_in_container() {
-    cd $LOCAL_DIR/../docker
     print_status "Running migrations in container..."
 
     docker compose exec backend bun run db:migrate
@@ -101,7 +104,6 @@ seed_database() {
 
 # Function to seed database in container
 seed_database_in_container() {
-    cd $LOCAL_DIR/../docker
     print_status "Seeding database in container..."
 
     docker compose exec backend bun run db:seed

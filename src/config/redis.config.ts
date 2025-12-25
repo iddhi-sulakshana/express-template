@@ -3,6 +3,7 @@ import { ENV } from '@/core';
 import winston from 'winston';
 
 let redisClient: Redis | null = null;
+let isConnected: boolean = false;
 
 function createRedisClient() {
   if (redisClient) {
@@ -13,18 +14,22 @@ function createRedisClient() {
 
   redisClient.on('connect', () => {
     winston.info('Redis connection established ✅');
+    isConnected = true;
   });
 
   redisClient.on('error', (error) => {
     winston.error('Redis connection error ❌', error);
+    isConnected = false;
   });
 
   redisClient.on('close', () => {
     winston.info('Redis connection closed ❌');
+    isConnected = false;
   });
 
   redisClient.on('reconnecting', () => {
     winston.info('Redis connection reconnecting ⏳');
+    isConnected = false;
   });
 
   return redisClient;
@@ -36,13 +41,19 @@ function getRedisClient() {
   }
   return redisClient;
 }
+
 function closeRedisClient() {
   if (redisClient) {
     redisClient.quit();
   }
 }
 
+function checkRedisConnection() {
+  return isConnected;
+}
+
 export default {
+  checkRedisConnection,
   createRedisClient,
   getRedisClient,
   closeRedisClient,

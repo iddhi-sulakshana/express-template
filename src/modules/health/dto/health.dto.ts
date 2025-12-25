@@ -12,13 +12,17 @@ export type HealthReport = {
     user: number;
   };
   dependencies: {
+    postgresql: {
+      status: 'OK' | 'ISSUE';
+      message: string;
+    };
+    redis: {
+      status: 'OK' | 'ISSUE';
+      message: string;
+    };
     [key: string]: {
       status: 'OK' | 'ISSUE';
       message: string;
     };
-  };
-  database: {
-    status: 'OK' | 'ISSUE';
-    message: string;
   };
 };

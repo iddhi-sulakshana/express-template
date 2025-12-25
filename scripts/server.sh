@@ -13,6 +13,11 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 LOCAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# if local dir is inside scripts remove the scripts part from LOCAL_DIR
+if [[ $LOCAL_DIR == *"scripts"* ]]; then
+    LOCAL_DIR="${LOCAL_DIR%/*}"
+fi
+
 # Function to print colored output
 print_status() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -59,7 +64,6 @@ show_usage() {
 # Function to start all services
 start_all_services() {
     print_status "Starting all services (backend + databases)..."
-    cd $LOCAL_DIR/../docker
     docker compose up -d --build
     docker compose ps
     print_success "All services started"
@@ -71,7 +75,6 @@ start_all_services() {
 # Function to start only database services
 start_database_services() {
     print_status "Starting only database services..."
-    cd $LOCAL_DIR/../docker
     docker compose up -d postgres redis
     docker compose ps
     print_success "Database services started"
@@ -83,7 +86,6 @@ start_database_services() {
 # Function to stop all services
 stop_all_services() {
     print_status "Stopping all services..."
-    cd $LOCAL_DIR/../docker
     docker compose down
     print_success "All services stopped"
 }
@@ -91,7 +93,6 @@ stop_all_services() {
 # Function to restart all services
 restart_all_services() {
     print_status "Restarting all services..."
-    cd $LOCAL_DIR/../docker
     docker compose restart
     print_success "All services restarted"
 }
@@ -99,14 +100,12 @@ restart_all_services() {
 # Function to show backend logs
 show_backend_logs() {
     print_status "Showing backend logs..."
-    cd $LOCAL_DIR/../docker
     docker compose logs -f
 }
 
 # Function to build backend service
 build_backend_service() {
     print_status "Building backend service..."
-    cd $LOCAL_DIR/../docker
     docker compose build
     print_success "Backend service built successfully"
 }
@@ -114,31 +113,8 @@ build_backend_service() {
 # Function to show status
 show_status() {
     print_status "Service Status:"
-    cd $LOCAL_DIR/../docker
     docker compose ps
     echo ""
-    print_status "Port Mapping:"
-    echo "  Backend:        localhost:3000"
-    echo "  PostgreSQL:     localhost:5434"
-    echo "  Redis:          localhost:6379"
-    echo ""
-    print_status "Current Package Manager:"
-    
-    # Check which configuration is currently active
-    cd $LOCAL_DIR/../docker
-    if grep -q "backend" docker-compose.yml; then
-        echo "  �� Bun (active)"
-    elif grep -q "backend-prod" docker-compose.yml; then
-        echo "  🚀 Production (active)"
-    else
-        echo "  ❓ No active configuration found"
-        echo "  Check docker-compose.yml for configuration issues"
-    fi
-    
-    # Show backup status
-    if [ -f "docker-compose.yml.backup" ]; then
-        echo "  💾 Backup available: docker-compose.yml.backup"
-    fi
 }
 
 # Function to clean up
@@ -147,7 +123,6 @@ clean_up() {
     read -r response
     if echo "$response" | grep -Eiq '^(yes|y)$'; then
         print_status "Cleaning up containers and volumes..."
-        cd $LOCAL_DIR/../docker
         docker compose down -v
         docker volume prune -f
         print_success "Cleanup completed"
