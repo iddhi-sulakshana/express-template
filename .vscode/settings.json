@@ -37,8 +37,8 @@
     ".dockerignore": true,
     "docker-entrypoint.sh": true,
     "drizzle.config.ts": true,
-    "**/config": true,
-    "**/.cursor": true
+    "**/.cursor": true,
+    "**/.nvmrc": true
   },
   "files.watcherExclude": {
     "**/node_modules/**": true,
@@ -71,7 +71,7 @@
     "docker-entrypoint.sh": false,
     "drizzle.config.ts": false,
     "**/config": false,
-    "**/.cursor": false
+    "**/.cursor": false,
   },
 
   // Terminal Configuration
