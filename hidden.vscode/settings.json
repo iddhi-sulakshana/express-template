@@ -1,0 +1,103 @@
+{
+  // TypeScript Configuration
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+
+  // Editor Configuration
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.minimap.enabled": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+
+  // File Configuration
+  "files.autoSave": "afterDelay",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/bun.lock": true,
+    "**/.bun": true,
+    "**/.vscode": true,
+    "**/.github": true,
+    "**/.husky": true,
+    "**/logs": true,
+    "**/.gitignore": true,
+    "**/.prettierrc": true,
+    "**/.prettierignore": true,
+    "**/tsconfig.json": true,
+    "**/tsconfig.tsbuildinfo": true,
+    "**/tsc-alias.config.js": true,
+    "scripts": true,
+    "docker": true,
+    "Dockerfile": true,
+    ".dockerignore": true,
+    "docker-entrypoint.sh": true,
+    "drizzle.config.ts": true,
+    "**/config": true,
+    "**/.cursor": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/.git/**": true
+  },
+
+  // Search Configuration
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/bun.lock": true,
+    "**/.bun": true,
+    "**/.vscode": true,
+    "**/.github": false,
+    "**/.husky": false,
+    "**/logs": false,
+    "**/.gitignore": false,
+    "**/.prettierrc": false,
+    "**/.prettierignore": false,
+    "**/tsconfig.json": false,
+    "**/tsconfig.tsbuildinfo": true,
+    "**/tsc-alias.config.js": true,
+    "scripts": false,
+    "docker": false,
+    "Dockerfile": false,
+    ".dockerignore": false,
+    "docker-entrypoint.sh": false,
+    "drizzle.config.ts": false,
+    "**/config": false,
+    "**/.cursor": false
+  },
+
+  // Terminal Configuration
+  "terminal.integrated.profiles": {
+    "Git Bash": {
+      "path": "C:\\Program Files\\Git\\bin\\bash.exe"
+    }
+  },
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+
+  "prettier.requireConfig": true,
+  "prettier.useEditorConfig": false,
+
+  // Git Configuration
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+
+  // Debug Configuration
+  "debug.allowBreakpointsEverywhere": true,
+  "debug.showBreakpointsInOverviewRuler": true,
+
+  // Workbench Configuration
+  "workbench.iconTheme": "material-icon-theme",
+
+  // Performance Settings
+  "typescript.tsserver.maxTsServerMemory": 4096
+}

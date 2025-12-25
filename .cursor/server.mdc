@@ -1,0 +1,18 @@
+---
+description: Standardized server management commands
+globs:
+alwaysApply: false
+---
+
+- Always use `./scripts/server.sh` to manage backend and database services.
+- Available commands:
+  - `./scripts/server.sh start` → Start backend + databases in the docker
+  - `./scripts/server.sh start-db` → Start only databases
+  - `./scripts/server.sh stop` → Stop all services
+  - `./scripts/server.sh restart` → Restart services
+  - `./scripts/server.sh logs` → Show backend logs
+  - `./scripts/server.sh build` → Build/rebuild backend
+  - `./scripts/server.sh status` → Show container/service status
+  - `./scripts/server.sh clean` → Clean up containers and volumes
+- If not using then use the `bun run dev` to start the backend
+- Do not run raw `docker compose` or `bun` commands for these tasks — always use the script.

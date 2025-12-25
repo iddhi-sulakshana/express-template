@@ -1,12 +1,13 @@
 import { HTTP_STATUS } from '@/core';
-import type { UserType } from '@/database/entities';
 import { UserRepository } from '@/database/repositories';
 import type { NextFunction, Request, Response } from 'express';
 import { verifyAccessToken } from '@/utils';
+import winston from 'winston';
+import type { EnumTypes } from '@/database/enums';
 
 const userRepository = new UserRepository();
 
-export default function authorize(accessibleRoles: UserType[] = []) {
+export function authorize(accessibleRoles: EnumTypes.UserType[] = []) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       let token: string | undefined;
@@ -24,6 +25,7 @@ export default function authorize(accessibleRoles: UserType[] = []) {
           return res.sendResponse({
             status: HTTP_STATUS.UNAUTHORIZED,
             message: 'Access denied: No token provided',
+            data: undefined,
           });
         }
       }
@@ -32,10 +34,14 @@ export default function authorize(accessibleRoles: UserType[] = []) {
       const decoded = verifyAccessToken(token);
 
       // Check if the user has the required role
+      // Security Improvement: Rather than checking the roles in the jwt token,
+      // we can check the roles in the database for the user and check,
+      // while saving the user and role details to the redis storage for faster middleware handling
       if (accessibleRoles.length > 0 && !accessibleRoles.includes(decoded.userType)) {
         return res.sendResponse({
           status: HTTP_STATUS.FORBIDDEN,
           message: 'Access denied: User does not have the required permissions',
+          data: undefined,
         });
       }
 
@@ -45,6 +51,7 @@ export default function authorize(accessibleRoles: UserType[] = []) {
         return res.sendResponse({
           status: HTTP_STATUS.UNAUTHORIZED,
           message: 'Access denied: User not found or inactive',
+          data: undefined,
         });
       }
 
@@ -62,12 +69,23 @@ export default function authorize(accessibleRoles: UserType[] = []) {
         return res.sendResponse({
           status: HTTP_STATUS.UNAUTHORIZED,
           message: 'Token expired: token rotation required',
+          data: undefined,
         });
       }
 
+      if (error.name === 'JsonWebTokenError') {
+        return res.sendResponse({
+          status: HTTP_STATUS.UNAUTHORIZED,
+          message: 'Access denied: Invalid token',
+          data: undefined,
+        });
+      }
+
+      winston.error(error.message, error);
       res.sendResponse({
         status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
         message: 'Uncaught Error',
+        data: undefined,
       });
     }
   };

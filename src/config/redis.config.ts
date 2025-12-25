@@ -4,7 +4,7 @@ import winston from 'winston';
 
 let redisClient: Redis | null = null;
 
-export function createRedisClient() {
+function createRedisClient() {
   if (redisClient) {
     return redisClient;
   }
@@ -30,15 +30,20 @@ export function createRedisClient() {
   return redisClient;
 }
 
-export function getRedisClient() {
+function getRedisClient() {
   if (!redisClient) {
     throw new Error('Redis client not initialized');
   }
   return redisClient;
 }
-
-export function closeRedisClient() {
+function closeRedisClient() {
   if (redisClient) {
     redisClient.quit();
   }
 }
+
+export default {
+  createRedisClient,
+  getRedisClient,
+  closeRedisClient,
+};

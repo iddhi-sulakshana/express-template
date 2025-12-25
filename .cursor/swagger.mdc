@@ -1,0 +1,10 @@
+---
+description: Swagger documentation rules
+globs: ['src/modules/**/swagger/*.yaml']
+alwaysApply: false
+---
+
+- Each module must have its own Swagger file.
+- Always use components for schemas.
+- Provide success and error examples.
+- Clearly specify authentication requirements.

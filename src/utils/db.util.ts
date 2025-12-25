@@ -1,4 +1,5 @@
-import { db } from 'config/database.config';
+import { ENV } from '@/core';
+import { configDatabase } from 'config';
 import { sql } from 'drizzle-orm';
 import winston from 'winston';
 
@@ -9,7 +10,7 @@ export async function checkDatabaseConnection() {
       const { database } = await getDatabaseDetails();
       winston.info(`Connecting to database '${database}'`);
       if (attempt > 1) winston.info(`Checking database connection attempt ${attempt}...`);
-      await db.execute(sql`SELECT 1`);
+      await configDatabase.db.execute(sql`SELECT 1`);
       return true;
     } catch (error: any) {
       winston.error('Error connecting to the database: ' + error.message, error);
@@ -24,7 +25,7 @@ export async function checkDatabaseConnection() {
 }
 
 async function getDatabaseDetails() {
-  const url = process.env.DATABASE_URL;
+  const url = ENV.DATABASE_URL;
   const urlObject = new URL(url);
   const database = urlObject.pathname.split('/').pop();
   const host = urlObject.hostname;
@@ -32,4 +33,12 @@ async function getDatabaseDetails() {
   const username = urlObject.username;
   const password = urlObject.password;
   return { database, host, port, username, password };
+}
+
+export async function withTransaction<T>(
+  callback: (tx: Parameters<Parameters<typeof configDatabase.db.transaction>[0]>[0]) => Promise<T>,
+): Promise<T> {
+  return await configDatabase.db.transaction(async (tx) => {
+    return await callback(tx);
+  });
 }

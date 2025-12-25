@@ -5,7 +5,7 @@ import type { ValidateUserResponseDto } from '../dto';
 const userRepository = new UserRepository();
 
 export async function validateUserService(
-  userId: string,
+  userId: number,
 ): Promise<DataResponse<ValidateUserResponseDto>> {
   const user = await userRepository.findById(userId);
   if (!user || user.userStatus !== 'ACTIVE') {

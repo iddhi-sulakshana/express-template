@@ -1,0 +1,14 @@
+---
+description: Module structure rules
+globs: ['src/modules/**']
+alwaysApply: false
+---
+
+- Every module must follow:
+  src/modules/{module}/
+  ├── index.ts
+  ├── controllers/
+  ├── services/
+  ├── dto/
+  └── swagger/
+- Swagger must be inside each module under `/swagger/`.

@@ -1,0 +1,12 @@
+{
+  "configurations": [
+    {
+      "name": "Debug Server",
+      "type": "bun",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/index.ts",
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

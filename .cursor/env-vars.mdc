@@ -1,0 +1,12 @@
+---
+description: Environment variable management rules
+globs: ['src/core/env.constants.ts', '.env.example']
+alwaysApply: false
+---
+
+- When adding new environment variables:
+  1. Add to `.env.example`
+  2. Add validation in `envSchema` (`src/core/env.constants.ts`)
+  3. Add static variable to `ENV` class
+  4. Configure in `configEnvironment()`
+- Never use `process.env` directly. Always use the `ENV` class.

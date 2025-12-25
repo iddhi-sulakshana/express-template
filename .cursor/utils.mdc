@@ -1,0 +1,8 @@
+---
+description: Utilities rules
+globs: ['src/utils/**/*.ts']
+alwaysApply: false
+---
+
+- Place shared functions in `src/utils/`.
+- Only reusable helpers allowed. No business logic in utils.

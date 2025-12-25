@@ -1,6 +1,6 @@
 # Docker Setup Guide
 
-This guide explains how to set up and run the Express Template server using Docker.
+This guide explains how to set up and run the Alagist server using Docker.
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@ This guide explains how to set up and run the Express Template server using Dock
 
 The Docker Compose setup includes the following services:
 
-### 1. Backend Service (backend-bun)
+### 1. Backend Service (backend)
 
 - **Image**: Custom build from `Dockerfile.bun`
 - **Port**: `3000` (mapped to container port `3000`)
@@ -24,11 +24,11 @@ The Docker Compose setup includes the following services:
 
 **Note**: You can easily switch to pnpm by uncommenting the `dockerfile: Dockerfile.pnpm` line and commenting out `dockerfile: Dockerfile.bun` in the docker-compose.yml file.
 
-### 2. PostgreSQL Database (dev-db)
+### 2. PostgreSQL Database (postgres)
 
 - **Image**: `postgis/postgis:13-3.1`
 - **Port**: `5434` (mapped to container port `5432`)
-- **Database**: `express-template-local`
+- **Database**: `alagist-local`
 - **Username**: `postgres`
 - **Password**: `12345`
 - **Data Persistence**: Yes (named volume)
@@ -56,10 +56,10 @@ docker-compose up
 
 ```bash
 # Start only backend + dependencies
-docker-compose up -d backend-bun dev-db redis
+docker-compose up -d backend postgres redis
 
 # Start only databases (if you want to run backend locally)
-docker-compose up -d dev-db redis
+docker-compose up -d postgres redis
 ```
 
 ### 2. Verify Services Are Running
@@ -73,7 +73,7 @@ docker-compose logs
 
 # View logs for specific service
 docker-compose logs redis
-docker-compose logs dev-db
+docker-compose logs postgres
 ```
 
 ### 3. Stop Services
@@ -143,28 +143,28 @@ chmod +x migration.sh
 ```bash
 # Start only specific service
 docker-compose up -d redis
-docker-compose up -d backend-bun
+docker-compose up -d backend
 
 # Stop only specific service
-docker-compose stop dev-db
-docker-compose stop backend-bun
+docker-compose stop postgres
+docker-compose stop backend
 
 # Restart specific service
 docker-compose restart redis
-docker-compose restart backend-bun
+docker-compose restart backend
 ```
 
 ### Backend Management
 
 ```bash
 # Build backend
-docker-compose build backend-bun
+docker-compose build backend
 
 # View backend logs
-docker-compose logs -f backend-bun
+docker-compose logs -f backend
 
 # Access backend shell
-docker-compose exec backend-bun sh
+docker-compose exec backend sh
 ```
 
 ### Viewing Logs
@@ -188,13 +188,13 @@ docker-compose logs -f redis
 
 ```bash
 # Backup PostgreSQL data
-docker exec express-template-dev-db-1 pg_dump -U postgres express-template-local > backup.sql
+docker exec alagist-server-postgres-1 pg_dump -U postgres alagist-local > backup.sql
 
 # Restore PostgreSQL data
-docker exec -i express-template-dev-db-1 psql -U postgres express-template-local < backup.sql
+docker exec -i alagist-server-postgres-1 psql -U postgres alagist-local < backup.sql
 
 # Backup Redis data (data is already persisted via AOF)
-docker exec express-template-redis-1 redis-cli BGSAVE
+docker exec alagist-server-redis-1 redis-cli BGSAVE
 ```
 
 ## Environment Variables
@@ -205,7 +205,7 @@ The services use the following environment variables:
 
 - `POSTGRES_USER`: postgres
 - `POSTGRES_PASSWORD`: 12345
-- `POSTGRES_DB`: express-template-local
+- `POSTGRES_DB`: alagist-local
 
 ### Redis
 
@@ -315,8 +315,8 @@ dockerfile: Dockerfile.bun
 **Note**: After manually changing the dockerfile, rebuild the container:
 
 ```bash
-docker-compose build backend-bun
-docker-compose up -d backend-bun
+docker-compose build backend
+docker-compose up -d backend
 ```
 
 ## Development Workflow
@@ -325,13 +325,13 @@ docker-compose up -d backend-bun
 
 ```bash
 # Clone repository and navigate to project
-cd express-template
+cd alagist-server
 
 # Start all services (backend + databases)
 docker-compose up -d
 
 # Wait for services to be ready (check logs)
-docker-compose logs -f backend-bun
+docker-compose logs -f backend
 ```
 
 ### 2. Daily Development
@@ -372,10 +372,10 @@ docker system df
 
 ```bash
 # Check PostgreSQL connection
-docker exec express-template-dev-db-1 pg_isready -U postgres
+docker exec alagist-server-postgres-1 pg_isready -U postgres
 
 # Check Redis connection
-docker exec express-template-redis-1 redis-cli ping
+docker exec alagist-server-redis-1 redis-cli ping
 ```
 
 ## Production Considerations
@@ -396,14 +396,14 @@ For production:
 ```bash
 # Service management
 docker-compose up -d          # Start all services
-docker-compose up -d backend-bun dev-db redis    # Start backend + databases
+docker-compose up -d backend postgres redis    # Start backend + databases
 docker-compose down           # Stop services
 docker-compose restart        # Restart all services
 docker-compose ps            # Show service status
 
 # Backend management
-docker-compose build backend-bun    # Build backend
-docker-compose logs -f backend-bun  # Follow backend logs
+docker-compose build backend    # Build backend
+docker-compose logs -f backend  # Follow backend logs
 
 # Logs
 docker-compose logs          # Show all logs
@@ -411,8 +411,8 @@ docker-compose logs -f       # Follow logs
 docker-compose logs <service> # Show specific service logs
 
 # Shell access
-docker-compose exec backend-bun sh   # Access backend container
-docker-compose exec dev-db psql -U postgres -d express-template-local
+docker-compose exec backend sh   # Access backend container
+docker-compose exec postgres psql -U postgres -d alagist-local
 docker-compose exec redis redis-cli
 
 # Cleanup

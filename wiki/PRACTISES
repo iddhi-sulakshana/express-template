@@ -1,0 +1,59 @@
+Create a new MD file in the wiki folder for the Codng best practices to follow when developing in this codebase there are few rules
+
+- Every developer has to work in the src folder outside that changes needs to inform the owner and get approval before changing anything
+- Same goes for the config file changing this file could lead to breaking changes application wide
+- Whenever adding new environment variable add it to the .env.example file, update the envSchema in the env.constants.ts file add it to the ENV class as astatic variable and configure it in the configEnvironment function and to use the environment variables in the codebase use the ENV class
+- When using status codes use the HTTP_STATUS object in the status-codes.constants.ts file
+- Always use the barrel file to export the files from a folder
+- When there is a need to alter the database schema use the database/schema/schema.ts file and use the migrations script to generate and apply the migrations to the database
+- When there is a need to add a new model use the database/schema/schema.ts file and use the migrations script to generate and apply the migrations to the database then create a new entity in the database/entities folder and use it in the codebase. also create a new repository in the database/repositories folder and use it in the codebase. Never directly call the database query outside the repository.
+- Whenever there is a need to add a seed data use the database/seed folder and create a new seed file and use the seed script to generate and apply the seed to the database.
+- Whenever possible use the enums in the database schema
+- If there is a need for short lived non persistent data to save use the redis server and add the logic to the database/redis folder and use the redis client in the codebase
+- Always use types never use any type is prohibited
+- If there is any reusable functions shared by other modules add it under the utils functions like date converstion functionalities so they will be same across the codebase
+- When there is a need to add a new module use the following structure:
+  -  create a new folder in the modules folder
+  -  create a index file in the new folder and create express router for the module and export it
+  -  Add the index file router to the main router in the index.ts file in the modules folder with the appropriate route path
+  -  create a controllers folder in the new folder
+  -  create a services folder in the new folder
+  -  create a dto folder in the new folder
+  -  create a swagger folder in the new folder
+- When addiing a new api endpoint use the following structure:
+  -  create a new dto file in the dto folder if needed
+    -  create a new dto schema for the endpoint request and response
+    -  always use the dto schema in the controller and service files
+    -  always use the zod schema to validate the request body, query params, headers, and path params
+    -  If there are any enums get it from the database entities folder
+  -  create a new service file in the services folder if needed
+    -  create a function for the business logic
+    -  Always service function should return a DataResponse object with the appropriate status code and message
+    -  Data response object data type should be the response dto type
+    -  If there is any error throw an ApiError with the appropriate status code and message
+    -  If there is any headers to be set use the data response object to set the headers using the headers element in the data response object
+    -  Service class return can be either Dataresponse, DownloadResponse, ViewResponse, ApiError, ZodError, Error
+    -  If there is any need to download a file use the DownloadResponse object
+    -  If there is any need to view a file use the ViewResponse object
+    -  If there is any need to send a json object use the DataResponse object
+    -  add the service to the index file for the barrel export
+  -  create a new controller file in the controllers folder if needed
+    -  in the controller file create a express router for the endpoint and export it
+    -  create a router endpoint using the router
+    -  Always use the appropriate service to handle the business logic
+    -  Always parse the request body, query params, headers, and path params using the zod schema defined in the dto file
+    -  If there is any validation error throw a ZodError with the appropriate status code and message
+    -  always get the response from the service and send it to the client using the sendResponse function in the response.config.ts file
+    -  Never send the response directly to the client from the service always use the sendResponse function in the response.config.ts file
+    -  Always protect in try catch block and in the catch block throw the error to the sendResponse function
+    -  add the controller to the index file for the barrel export
+  - Add the controller to the module index router file with the appropriate route path
+  -  create a new swagger file in the swagger folder if needed
+    -  Create a new swagger file for the endpoint and add it to the swagger folder
+    -  In the swagger file only add the path object
+    -  If the emdpoint is authenticated add the authorize middleware and request type to be AuthRequest
+    -  Add the path object to the swagger file with the appropriate method, summary, description, tags, request body, query params, headers, and path params
+    -  Always use examples for the request body, query params, headers, and path params for showing different scenarios available
+    -  Always use examples for the error response for showing different scenarios available
+    -  Always use proper tags and description for the endpoint
+    -  Always use components for big objects like request body, query params, headers, and path params, response body, error response, etc

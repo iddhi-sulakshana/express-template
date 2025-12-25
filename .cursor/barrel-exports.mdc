@@ -1,0 +1,8 @@
+---
+description: Barrel file rules
+globs: ['src/**/*.ts']
+alwaysApply: false
+---
+
+- Every folder must include an `index.ts` for exports.
+- Always import from barrel files, not deep paths.

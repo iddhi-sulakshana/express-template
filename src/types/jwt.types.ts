@@ -1,14 +1,14 @@
-import type { UserStatus, UserType } from '@/database/entities';
+import type { EnumTypes } from '@/database/enums';
 
 export interface JwtTokenPayload {
-  id: string;
+  id: number;
   iat?: number;
   exp?: number;
 }
 
 export interface JwtAccessTokenPayload extends JwtTokenPayload {
-  userType: UserType;
-  userStatus: UserStatus;
+  userType: EnumTypes.UserType;
+  userStatus: EnumTypes.UserStatus;
 }
 
 export interface JwtRefreshTokenPayload extends JwtTokenPayload {
@@ -72,7 +72,7 @@ export const jwtExpiryRegex = new RegExp(
 export interface RefreshTokenRedisRecord {
   sessionId: string;
   refreshTokenId: string;
-  userId: string;
+  userId: number;
   revoked: boolean;
   expiresAt: number;
 }

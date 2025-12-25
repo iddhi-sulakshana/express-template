@@ -1,6 +1,6 @@
 # Database Migration Guide
 
-This guide explains how to apply and manage database migrations in the Express Template project using Drizzle ORM.
+This guide explains how to apply and manage database migrations in the Alagist Server project using Drizzle ORM.
 
 ## Overview
 
@@ -25,7 +25,7 @@ DATABASE_URL=postgresql://username:password@host:port/database_name
 Using the provided Docker Compose setup (with PostGIS support):
 
 ```env
-DATABASE_URL=postgresql://postgres:12345@localhost:5434/express-template-local
+DATABASE_URL=postgresql://postgres:12345@localhost:5434/alagist-local
 ```
 
 **Important**: The Docker Compose uses `postgis/postgis:13-3.1` image which includes PostGIS extension.
@@ -78,7 +78,7 @@ If you prefer to run commands manually or need more control:
 
 ```bash
 # Start PostgreSQL with Docker Compose
-docker-compose up -d dev-db
+docker-compose up -d postgres
 ```
 
 ### 2. Generate New Migration
@@ -229,7 +229,7 @@ pnpm run db:push
 ```yaml
 # docker-compose.yml
 services:
-  dev-db:
+  postgres:
     image: postgis/postgis:13-3.1 # ← Use PostGIS image, not postgres:13
     # ... rest of config
 ```
@@ -238,7 +238,7 @@ Then restart your database:
 
 ```bash
 docker-compose down
-docker-compose up -d dev-db
+docker-compose up -d postgres
 ```
 
 **Check PostGIS availability**:
@@ -361,7 +361,7 @@ chmod +x migration.sh
 
 ```bash
 # Database Management
-docker-compose up -d dev-db           # Start local database
+docker-compose up -d postgres           # Start local database
 docker-compose down                   # Stop local database
 
 # Migration Commands

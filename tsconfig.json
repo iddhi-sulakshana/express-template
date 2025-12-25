@@ -6,7 +6,7 @@
     "module": "ESNext",
     "moduleDetection": "force",
     "jsx": "react-jsx",
-    "allowJs": true,
+    "allowJs": false,
 
     // Bundler mode
     "moduleResolution": "bundler",
@@ -34,6 +34,14 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["src/**/*", "src/**/*.yaml", "src/**/*.yml", "environment.d.ts"],
-  "exclude": ["node_modules", "dist", "logs", "build"]
+
+  "include": [
+    "src/**/*",
+    "src/**/*.yaml",
+    "src/**/*.yml",
+    "environment.d.ts",
+    "src/**/*.swagger.yaml",
+    "src/**/*.swagger.yml"
+  ],
+  "exclude": ["**/node_modules", "**/dist", "**/logs", "**/build"]
 }

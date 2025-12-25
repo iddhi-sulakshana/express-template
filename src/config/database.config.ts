@@ -1,21 +1,23 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import { config } from 'dotenv-safe';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema/schema';
+import { Pool } from 'pg';
+import { ENV } from '@/core';
 
-// Load environment variables
-config();
-
-const connectionString = process.env.DATABASE_URL;
+const connectionString = ENV.DATABASE_URL;
 
 if (!connectionString) {
   throw new Error('DATABASE_URL is required');
 }
 
-// Create postgres connection
-const client = postgres(connectionString);
+const pool = new Pool({
+  connectionString: connectionString,
+});
 
 // Create drizzle instance
-export const db = drizzle(client);
+const db = drizzle(pool, { schema: schema });
+
+export type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+export type DbInstance = typeof db | DbTransaction;
 
 // Export the client for migrations
-export { client };
+export default { pool, db };

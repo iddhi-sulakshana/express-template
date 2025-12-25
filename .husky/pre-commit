@@ -1,0 +1,43 @@
+# Using bun as package manager
+echo "Using bun as package manager 📦"
+
+branch_name=$(git symbolic-ref --short HEAD)
+if [ "$branch_name" = "main" ] || [ "$branch_name" = "develop" ] || [ "$branch_name" = "staging" ] || [ "$branch_name" = "production" ]; then
+  echo "\033[31mDirect pushes to locked branches are not allowed 🚫\033[0m"
+  # exit 1
+fi
+
+# Get list of all staged files (including renamed and deleted)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR || true)
+
+if [ -z "$STAGED_FILES" ]; then
+  echo "\033[32mNo staged files ✅\033[0m"
+  exit 1
+fi
+
+# Filter staged files to only those that prettier can format (and that still exist)
+FORMATTABLE_FILES=$(echo "$STAGED_FILES" | grep -E '\.(js|jsx|ts|tsx|css|md|json|scss|html)$' | while read file; do [ -f "$file" ] && echo "$file"; done || true)
+
+if [ -z "$FORMATTABLE_FILES" ]; then
+  echo "\033[32mNo files to format ✅\033[0m"
+else
+
+echo "\033[36mFormatting staged files...\033[0m"
+
+# Run prettier on formattable staged files only
+echo "$FORMATTABLE_FILES" | xargs prettier --write --config ./.prettierrc
+
+# Check if prettier made any changes to the formatted files
+CHANGED_FILES=$(echo "$FORMATTABLE_FILES" | xargs git diff --name-only || true)
+
+if [ ! -z "$CHANGED_FILES" ]; then
+  echo "\033[33mSome staged files were changed by formatting: 🚫\033[0m"
+  echo "$CHANGED_FILES"
+  echo "\033[33mPlease review the changes, stage them, and commit again 💡\033[0m"
+  exit 1
+fi
+fi
+
+bun run commit:check
+
+echo "\033[32mStaged files formatted successfully ✅\033[0m"

@@ -1,0 +1,186 @@
+---
+description: Git workflow and version control best practices
+alwaysApply: true
+---
+
+# Git & Development Workflow
+
+## Commit Messages
+
+Follow conventional commit format for clear history:
+
+```bash
+# Format: <type>: <description>
+
+# Types:
+feat:     # New feature
+fix:      # Bug fix
+docs:     # Documentation changes
+style:    # Code style changes (formatting, no logic change)
+refactor: # Code refactoring
+perf:     # Performance improvements
+test:     # Adding or updating tests
+chore:    # Maintenance tasks (dependencies, configs)
+
+# Examples:
+git commit -m "feat: add appointment booking form"
+git commit -m "fix: resolve date picker timezone issue"
+git commit -m "docs: update API integration guide"
+git commit -m "refactor: extract form validation logic to custom hook"
+```
+
+### Commit Message Guidelines
+
+- Be descriptive but concise (50 chars for subject line)
+- Use imperative mood ("add" not "added" or "adds")
+- Reference issue numbers when applicable
+- Provide context in the body for complex changes
+
+```bash
+# ✅ Good
+feat: add user authentication flow
+
+Implements login, logout, and token refresh functionality.
+Uses JWT tokens stored in local storage with automatic
+refresh before expiration.
+
+Closes #123
+
+# ❌ Bad
+fixed stuff
+updated code
+changes
+```
+
+## Branch Naming
+
+Use descriptive branch names with consistent prefixes:
+
+```bash
+# Format: <type>/<description>
+
+feature/appointment-booking
+feature/user-profile-page
+fix/calendar-date-bug
+fix/auth-token-expiration
+refactor/api-client-structure
+chore/update-dependencies
+
+# ✅ Good examples
+feature/add-payment-integration
+fix/resolve-mobile-menu-overflow
+refactor/extract-form-components
+
+# ❌ Bad examples
+my-branch
+test
+fix-bug
+update
+```
+
+## Protected Branches
+
+The following branches are protected by pre-commit and pre-push hooks:
+
+- `main` - Production branch
+- `develop` - Development branch
+- `staging` - Staging environment
+- `production` - Production deployment
+
+**Direct pushes to these branches are not allowed.**
+
+## Pre-commit Hooks
+
+The `.husky/pre-commit` hook runs:
+
+1. `bun run commit:check` - Formats code and runs type checking
+2. Verifies no files were modified by formatting
+3. Blocks commit if formatting changed files (stage them first)
+
+```bash
+# Pre-commit checks:
+- Code formatting (Prettier)
+- Type checking (TypeScript)
+- Prevents direct commits to protected branches
+```
+
+## Pre-push Hooks
+
+The `.husky/pre-push` hook runs:
+
+1. `bun run push:check` - Installs deps, type checks, and builds
+2. Blocks push to protected branches
+
+```bash
+# Pre-push checks:
+- Dependency installation
+- Type checking
+- Build verification
+- Branch protection
+```
+
+## Development Workflow
+
+1. **Create branch** from `develop`:
+
+   ```bash
+   git checkout develop
+   git pull origin develop
+   git checkout -b feature/my-new-feature
+   ```
+
+2. **Make changes** and commit regularly:
+
+   ```bash
+   git add .
+   git commit -m "feat: add new feature component"
+   ```
+
+3. **Push changes**:
+
+   ```bash
+   git push origin feature/my-new-feature
+   ```
+
+4. **Create Pull Request** to `develop`
+
+5. **After review**, merge to `develop`
+
+## Pull Request Guidelines
+
+- Provide clear description of changes
+- Reference related issues
+- Ensure CI/CD checks pass
+- Request reviews from team members
+- Keep PRs focused and reasonably sized
+
+```markdown
+## Description
+
+Brief description of what this PR does
+
+## Changes
+
+- Added appointment booking form
+- Implemented form validation
+- Connected to API endpoint
+
+## Testing
+
+- [ ] Tested locally
+- [ ] Added unit tests
+- [ ] Tested on mobile
+
+## Related Issues
+
+Closes #123
+```
+
+## Code Review Checklist
+
+- Code follows project style guidelines
+- No console.log statements left in code
+- TypeScript types are properly defined
+- Components are properly documented
+- No unnecessary dependencies added
+- Tests pass and coverage maintained

@@ -1,11 +1,11 @@
-import type { UserStatus, UserType } from '@/database/entities';
+import type { EnumTypes } from '@/database/enums';
 import z from 'zod';
 
 export interface EmailSigninResponseDto {
-  id: string;
+  id: number;
   email: string;
-  userType: UserType;
-  userStatus: UserStatus;
+  userType: EnumTypes.UserType;
+  userStatus: EnumTypes.UserStatus;
 }
 
 export const emailSigninSchema = z.object({

@@ -1,0 +1,16 @@
+---
+description: Use migration.sh for DB tasks instead of raw ORM commands
+globs:
+alwaysApply: false
+---
+
+- Always use `./scripts/migration.sh` for database operations
+- Use:
+  - `./scripts/migration.sh generate` to generate migrations
+  - `./scripts/migration.sh migrate` to run migrations
+  - `./scripts/migration.sh seed` to seed data
+- If Using Docker
+  - `./scripts/migration.sh generate-container` to generate migrations
+  - `./scripts/migration.sh migrate-container` to run migrations
+  - `./scripts/migration.sh seed-container` to seed data
+- Do not call raw Prisma/TypeORM/Bun migration commands directly

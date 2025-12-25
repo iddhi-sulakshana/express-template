@@ -1,0 +1,10 @@
+---
+description: Database schema and repository rules
+globs: ['src/database/**/*.ts']
+alwaysApply: false
+---
+
+- Add new tables in `src/database/schema/schema.ts`.
+- Always generate & apply migrations via scripts.
+- Entities must use `InferSelectModel` & `InferInsertModel`.
+- All DB access must go through repositories.

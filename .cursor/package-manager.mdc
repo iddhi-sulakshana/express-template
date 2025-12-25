@@ -1,0 +1,12 @@
+---
+description: Always use Bun for package management and scripts
+globs:
+alwaysApply: true
+---
+
+- Always use **Bun** as the package manager in this project.
+- Use:
+  - `bun install` for installing dependencies
+  - `bun run <script>` for running scripts
+  - `bun <command>` for executing tasks
+- Do not use `npm`, `yarn`, or `pnpm` in this project.

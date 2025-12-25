@@ -1,0 +1,15 @@
+---
+description: API endpoint development rules
+globs: ['src/modules/**/controllers/*.ts']
+alwaysApply: false
+---
+
+- Controllers:
+  - Validate request body, query and params with Zod DTOs.
+  - Call services only (no DB/Redis directly).
+  - Use `res.sendResponse()` for responses.
+
+- Services:
+  - Contain all business logic.
+  - Throw `ApiError` with `HTTP_STATUS` for errors.
+  - Return standardized response objects.

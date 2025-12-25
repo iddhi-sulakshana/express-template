@@ -6,7 +6,7 @@ This document provides step-by-step instructions for converting this project int
 
 ### 1. Project Renaming
 
-- [ ] Rename the project directory from `alagist-server` to your desired project name
+- [ ] Rename the project directory from `express-template` to your desired project name
 - [ ] Update `package.json` name field (already done: `express-template`)
 - [ ] Update any remaining references in documentation
 

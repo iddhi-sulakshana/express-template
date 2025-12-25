@@ -1,9 +1,8 @@
-import type { UserStatus } from '@/database/entities';
-import type { UserType } from '@/database/entities';
+import type { EnumTypes } from '@/database/enums';
 
 export type ValidateUserResponseDto = {
-  id: string;
+  id: number;
   email: string;
-  userType: UserType;
-  userStatus: UserStatus;
+  userType: EnumTypes.UserType;
+  userStatus: EnumTypes.UserStatus;
 };

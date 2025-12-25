@@ -1,37 +1,56 @@
 services:
-  # Backend with Bun (recommended for performance)
-  backend-bun:
+  backend:
     build:
       context: .
-      # Uncomment this line to use pnpm instead of bun
-      dockerfile: Dockerfile.pnpm
-      # dockerfile: Dockerfile.bun
     ports:
       - '3000:3000'
     environment:
       NODE_ENV: development
       PORT: 3000
-      DATABASE_URL: postgresql://postgres:12345@dev-db:5432/express-template-local
+      DATABASE_URL: postgresql://postgres:12345@postgres:5432/system-local
       REDIS_URL: redis://redis:6379
     volumes:
       - .:/app
       - /app/node_modules
       - /app/.bun
     depends_on:
-      - dev-db
+      - postgres
       - redis
     restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'bun',
+          'run',
+          '-e',
+          'fetch("http://localhost:3000/api/v1/health").then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - system-network
 
-  dev-db:
-    image: postgis/postgis:13-3.1
+  postgres:
+    image: postgres:17-alpine
     ports:
-      - 5434:5432
+      - 5432:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: express-template-local
+      POSTGRES_DB: system-local
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - system-network
 
   redis:
     image: redis:7-alpine
@@ -40,8 +59,20 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
+    networks:
+      - system-network
 
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  system-network:
+    driver: bridge

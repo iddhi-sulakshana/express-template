@@ -1,0 +1,17 @@
+---
+description: Core base rules for the backend server project
+alwaysApply: true
+---
+
+🚨 Critical Restrictions
+
+- All source code must live inside `src/`.
+- Config file changes require owner approval.
+- No direct DB queries outside repositories.
+
+✅ Required Practices
+
+- Always use barrel files for exports.
+- Use enums in DB schema when possible.
+- Wrap risky logic in try/catch with proper ApiError handling.
+- Follow established module structure.

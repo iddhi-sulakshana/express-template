@@ -1,0 +1,8 @@
+---
+description: Redis usage rules
+globs: ['src/database/redis/**/*.ts']
+alwaysApply: false
+---
+
+- Use Redis only for short-lived data (OTP, sessions, caches).
+- Always namespace keys (e.g., `otp:`, `session:`).

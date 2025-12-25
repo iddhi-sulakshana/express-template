@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import type { Router as ExpressRouter } from 'express';
 import { validateUserService } from '../services';
-import authorize from '@/middlewares/auth.middleware';
+import { authorize } from '@/middlewares';
 import type { AuthRequest } from '@/types';
 
 const router: ExpressRouter = Router();

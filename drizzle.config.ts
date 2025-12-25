@@ -1,7 +1,4 @@
 import { defineConfig } from 'drizzle-kit';
-import { config } from 'dotenv-safe';
-
-config();
 
 export default defineConfig({
   schema: './src/database/schema/*',

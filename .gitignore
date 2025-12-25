@@ -1,5 +1,5 @@
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
-
+*claude*
 # Logs
 
 logs
@@ -8,7 +8,6 @@ npm-debug.log_
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
-.pnpm-debug.log*
 
 # Caches
 
@@ -174,7 +173,5 @@ dist
 # Finder (MacOS) folder config
 .DS_Store
 
-# Bun lock
-bun.lock
-
 docker-compose.yml.backup
+**/uploads

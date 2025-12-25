@@ -1,0 +1,15 @@
+---
+description: Response handling rules
+alwaysApply: true
+---
+
+- Services must return one of:
+  - DataResponse with data type if available (JSON)
+  - DownloadResponse (file)
+  - ViewResponse (view file)
+  - or throw an ApiError
+
+- Controllers must always catch errors and call:
+  ```ts
+  res.sendResponse(error);
+  ```

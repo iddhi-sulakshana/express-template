@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "ms-vscode.vscode-typescript-next",
+    "PKief.material-icon-theme",
+    "christian-kohler.npm-intellisense",
+    "esbenp.prettier-vscode",
+    "wayou.vscode-todo-highlight",
+    "Gruntfuggly.todo-tree",
+    "redhat.vscode-yaml",
+    "oven.bun-vscode",
+    "3xpo.regionfolding"
+  ]
+}

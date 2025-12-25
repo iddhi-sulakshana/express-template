@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-# Database Migration Script for Express Template
+# Database Migration Script for Alagist Server
 # Usage: ./migration.sh [command] [option]
 
 set -e
@@ -11,6 +11,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+LOCAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Function to print colored output
 print_status() {
@@ -36,67 +37,76 @@ show_usage() {
     echo "Commands:"
     echo "  generate            Generate migration files from schema changes"
     echo "  migrate             Run database migrations"
+    echo "  seed                Seed database with initial data"
     echo "  generate-container  Generate migration files in container"
     echo "  migrate-container   Run migrations in container"
+    echo "  seed-container      Seed database in container"
     echo ""
     echo "Examples:"
     echo "  $0 generate                 # Generate migration files"
     echo "  $0 migrate                  # Run migrations locally"
+    echo "  $0 seed                     # Seed database locally"
     echo "  $0 generate-container       # Generate migration files in container"
     echo "  $0 migrate-container        # Run migrations in container"
-}
-
-# Function to detect package manager
-detect_package_manager() {
-    if command -v bun &> /dev/null; then
-        echo "bun"
-    elif command -v pnpm &> /dev/null; then
-        echo "pnpm"
-    else
-        echo "npm"
-    fi
+    echo "  $0 seed-container           # Seed database in container"
 }
 
 # Function to run migrations
 run_migrations() {
-    local package_manager=$(detect_package_manager)
-    
-    print_status "Running database migrations using $package_manager..."
-    
-    $package_manager run db:migrate
-        
+    print_status "Running database migrations using bun..."
+
+    bun run db:migrate
+
     print_success "Migrations completed successfully!"
 }
 
 # Function to generate migration files
 generate_migrations() {
-    local package_manager=$(detect_package_manager)
-    
-    print_status "Generating migration files using $package_manager..."
-    
-    $package_manager run db:generate
-    
+    print_status "Generating migration files using bun..."
+
+    bun run db:generate
+
     print_success "Migration files generated successfully!"
     print_status "Review the generated files in src/database/migrations/"
 }
 
 # Function to generate migration files in container
 generate_migrations_in_container() {
-    
+    cd $LOCAL_DIR/../docker
     print_status "Generating migration files in container..."
-    
-    docker-compose exec backend-bun /bin/sh -c "./migration.sh generate"
-    
+
+    docker compose exec backend bun run db:generate
+
     print_success "Migration files generated successfully in container!"
 }
 
 # Function to run migrations in container
 run_migrations_in_container() {
+    cd $LOCAL_DIR/../docker
     print_status "Running migrations in container..."
-    
-    docker-compose exec backend-bun /bin/sh -c "./migration.sh migrate"
-    
+
+    docker compose exec backend bun run db:migrate
+
     print_success "Migrations completed successfully in container!"
+}
+
+# Function to seed database
+seed_database() {
+    print_status "Seeding database using bun..."
+
+    bun run db:seed
+
+    print_success "Database seeding completed successfully!"
+}
+
+# Function to seed database in container
+seed_database_in_container() {
+    cd $LOCAL_DIR/../docker
+    print_status "Seeding database in container..."
+
+    docker compose exec backend bun run db:seed
+
+    print_success "Database seeding completed successfully in container!"
 }
 
 # Main script logic
@@ -108,11 +118,17 @@ main() {
         "generate")
             generate_migrations
             ;;
+        "seed")
+            seed_database
+            ;;
         "generate-container")
             generate_migrations_in_container
             ;;
         "migrate-container")
             run_migrations_in_container
+            ;;
+        "seed-container")
+            seed_database_in_container
             ;;
         *)
             show_usage

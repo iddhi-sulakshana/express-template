@@ -4,15 +4,15 @@ FROM oven/bun:1.0-alpine
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++ \
-    && rm -rf /var/cache/apk/*
+# Install system dependencies if required by any of the node packages
+# RUN apk add --no-cache \
+#     python3 \
+#     make \
+#     g++ \
+#     && rm -rf /var/cache/apk/*
 
 # Copy package files
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json bun.lock ./
 
 # Install Bun globally (if not already available)
 RUN bun --version
@@ -31,4 +31,4 @@ ENV NODE_ENV=development
 ENV PORT=3000
 
 # Start the application with hot reload
-CMD ["/bin/sh", "bun", "run", "--watch", "src/index.ts"] 
+CMD ["bun", "run", "--watch", "src/index.ts"]

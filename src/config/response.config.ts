@@ -7,14 +7,19 @@ import {
   type DownloadResponse,
   type ViewResponse,
   ApiError,
-} from '../types/api-contract.types';
+} from '@/types/api-contract.types';
 import winston from 'winston';
 import { ZodError } from 'zod';
-import { HTTP_STATUS } from '../core';
-import { ENV } from '../core';
+import { HTTP_STATUS, ENV } from '@/core';
 
 response.sendResponse = function <T>(
-  response: DataResponse<T> | DownloadResponse | ViewResponse | ApiError | ZodError | Error,
+  response:
+    | DataResponse<T extends undefined ? undefined : T>
+    | DownloadResponse
+    | ViewResponse
+    | ApiError
+    | ZodError
+    | Error,
 ) {
   // Handle Zod validation errors
   if (response instanceof ZodError) {
@@ -63,6 +68,10 @@ response.sendResponse = function <T>(
       response.headers.forEach((header: any) => {
         this.set(header.name, header.value);
       });
+      this.set(
+        'Access-Control-Expose-Headers',
+        response.headers.map((header: any) => header.name).join(', '),
+      );
     }
   }
 
