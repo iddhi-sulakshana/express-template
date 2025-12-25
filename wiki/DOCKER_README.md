@@ -15,20 +15,18 @@ The Docker Compose setup includes the following services:
 
 ### 1. Backend Service (backend)
 
-- **Image**: Custom build from `Dockerfile.bun`
+- **Image**: Custom build from `Dockerfile`
 - **Port**: `3000` (mapped to container port `3000`)
 - **Package Manager**: Bun with native TypeScript support
 - **Hot Reload**: Built-in watch mode for instant code changes
 - **Performance**: Faster startup and execution
 - **Volume Mounting**: Source code mounted for live development
 
-**Note**: You can easily switch to pnpm by uncommenting the `dockerfile: Dockerfile.pnpm` line and commenting out `dockerfile: Dockerfile.bun` in the docker-compose.yml file.
-
 ### 2. PostgreSQL Database (postgres)
 
-- **Image**: `postgis/postgis:13-3.1`
-- **Port**: `5434` (mapped to container port `5432`)
-- **Database**: `alagist-local`
+- **Image**: `postgres:15-alpine`
+- **Port**: `5432` (mapped to container port `5432`)
+- **Database**: `system-local`
 - **Username**: `postgres`
 - **Password**: `12345`
 - **Data Persistence**: Yes (named volume)
@@ -46,49 +44,50 @@ The Docker Compose setup includes the following services:
 
 ```bash
 # Start all services (backend + databases)
-docker-compose up -d
+docker compose up -d
 
 # Or start with logs visible
-docker-compose up
+docker compose up
 ```
 
 ### 2. Start Specific Services
 
 ```bash
 # Start only backend + dependencies
-docker-compose up -d backend postgres redis
+docker compose up -d backend postgres redis
 
 # Start only databases (if you want to run backend locally)
-docker-compose up -d postgres redis
+docker compose up -d postgres redis
 ```
 
 ### 2. Verify Services Are Running
 
 ```bash
 # Check service status
-docker-compose ps
+docker compose ps
 
 # View logs
-docker-compose logs
+docker compose logs
 
 # View logs for specific service
-docker-compose logs redis
-docker-compose logs postgres
+docker compose logs backend
+docker compose logs redis
+docker compose logs postgres
 ```
 
 ### 3. Stop Services
 
 ```bash
 # Stop services
-docker-compose down
+docker compose down
 
 # Stop and remove volumes (WARNING: This will delete all data)
-docker-compose down -v
+docker compose down -v
 ```
 
 ### 4. Using the Server Script (Recommended)
 
-We provide a convenient `server.sh` script for easy management:
+We provide a convenient [server.sh](../scripts/server.sh) script for easy management:
 
 ```bash
 # Make the script executable (first time only)
@@ -105,15 +104,11 @@ chmod +x server.sh
 
 # View logs
 ./server.sh logs
-
-# Switch package managers
-./server.sh switch-pnpm
-./server.sh switch-bun
 ```
 
 ### Database Migrations
 
-We provide a convenient `migration.sh` script for easy database management:
+We provide a convenient [migration.sh](../scripts/migration.sh) script for easy database management:
 
 ```bash
 # Make the script executable (first time only)
@@ -142,39 +137,39 @@ chmod +x migration.sh
 
 ```bash
 # Start only specific service
-docker-compose up -d redis
-docker-compose up -d backend
+docker compose up -d redis
+docker compose up -d backend
 
 # Stop only specific service
-docker-compose stop postgres
-docker-compose stop backend
+docker compose stop postgres
+docker compose stop backend
 
 # Restart specific service
-docker-compose restart redis
-docker-compose restart backend
+docker compose restart redis
+docker compose restart backend
 ```
 
 ### Backend Management
 
 ```bash
 # Build backend
-docker-compose build backend
+docker compose build backend
 
 # View backend logs
-docker-compose logs -f backend
+docker compose logs -f backend
 
 # Access backend shell
-docker-compose exec backend sh
+docker compose exec backend sh
 ```
 
 ### Viewing Logs
 
 ```bash
 # Follow logs in real-time
-docker-compose logs -f
+docker compose logs -f
 
 # Follow logs for specific service
-docker-compose logs -f redis
+docker compose logs -f redis
 ```
 
 ## Data Persistence
@@ -188,13 +183,13 @@ docker-compose logs -f redis
 
 ```bash
 # Backup PostgreSQL data
-docker exec alagist-server-postgres-1 pg_dump -U postgres alagist-local > backup.sql
+docker compose exec postgres pg_dump -U postgres system-local > backup.sql
 
 # Restore PostgreSQL data
-docker exec -i alagist-server-postgres-1 psql -U postgres alagist-local < backup.sql
+docker compose exec postgres psql -U postgres system-local < backup.sql
 
 # Backup Redis data (data is already persisted via AOF)
-docker exec alagist-server-redis-1 redis-cli BGSAVE
+docker compose exec redis redis-cli BGSAVE
 ```
 
 ## Environment Variables
@@ -205,7 +200,7 @@ The services use the following environment variables:
 
 - `POSTGRES_USER`: postgres
 - `POSTGRES_PASSWORD`: 12345
-- `POSTGRES_DB`: alagist-local
+- `POSTGRES_DB`: system-local
 
 ### Redis
 
@@ -219,7 +214,7 @@ The services use the following environment variables:
 
 ```bash
 # Check what's using the ports
-sudo lsof -i :5434
+sudo lsof -i :5432
 sudo lsof -i :6379
 
 # Kill processes using the ports
@@ -237,7 +232,7 @@ sudo chown -R $USER:$USER ./volumes/
 
 ```bash
 # Check service logs
-docker-compose logs <service-name>
+docker compose logs <service-name>
 
 # Check Docker daemon
 docker system info
@@ -272,13 +267,13 @@ bash -n migration.sh
 
 ```bash
 # Stop all services and remove everything
-docker-compose down -v --remove-orphans
+docker compose down -v --remove-orphans
 
 # Remove all containers and images
 docker system prune -a
 
 # Start fresh
-docker-compose up -d
+docker compose up -d
 ```
 
 ## Hot Reload & Development
@@ -291,34 +286,6 @@ The backend service supports hot reload for seamless development:
 - **Volume Mounting**: Source code is mounted as volumes, so changes are reflected immediately
 - **No Rebuilds**: Code changes don't require container restarts
 
-### Switching Package Managers
-
-You can easily switch between Bun and pnpm using the server script:
-
-```bash
-# Switch to pnpm
-./server.sh switch-pnpm
-
-# Switch back to Bun
-./server.sh switch-bun
-```
-
-**Manual Method**: You can also edit the `docker-compose.yml` file directly:
-
-```yaml
-# For Bun (default)
-dockerfile: Dockerfile.bun
-# For pnpm (uncomment this line and comment out the Bun line)
-# dockerfile: Dockerfile.pnpm
-```
-
-**Note**: After manually changing the dockerfile, rebuild the container:
-
-```bash
-docker-compose build backend
-docker-compose up -d backend
-```
-
 ## Development Workflow
 
 ### 1. First Time Setup
@@ -328,32 +295,32 @@ docker-compose up -d backend
 cd alagist-server
 
 # Start all services (backend + databases)
-docker-compose up -d
+docker compose up -d
 
 # Wait for services to be ready (check logs)
-docker-compose logs -f backend
+docker compose logs -f backend
 ```
 
 ### 2. Daily Development
 
 ```bash
 # Start services
-docker-compose up -d
+docker compose up -d
 
 # Work on your code...
 
 # Stop services when done
-docker-compose down
+docker compose down
 ```
 
 ### 3. Service Updates
 
 ```bash
 # Pull latest images
-docker-compose pull
+docker compose pull
 
 # Restart services with new images
-docker-compose up -d
+docker compose up -d
 ```
 
 ## Monitoring
@@ -372,10 +339,10 @@ docker system df
 
 ```bash
 # Check PostgreSQL connection
-docker exec alagist-server-postgres-1 pg_isready -U postgres
+docker compose exec postgres pg_isready -U postgres
 
 # Check Redis connection
-docker exec alagist-server-redis-1 redis-cli ping
+docker compose exec redis redis-cli ping
 ```
 
 ## Production Considerations
@@ -395,28 +362,28 @@ For production:
 
 ```bash
 # Service management
-docker-compose up -d          # Start all services
-docker-compose up -d backend postgres redis    # Start backend + databases
-docker-compose down           # Stop services
-docker-compose restart        # Restart all services
-docker-compose ps            # Show service status
+docker compose up -d          # Start all services
+docker compose up -d backend postgres redis    # Start backend + databases
+docker compose down           # Stop services
+docker compose restart        # Restart all services
+docker compose ps            # Show service status
 
 # Backend management
-docker-compose build backend    # Build backend
-docker-compose logs -f backend  # Follow backend logs
+docker compose build backend    # Build backend
+docker compose logs -f backend  # Follow backend logs
 
 # Logs
-docker-compose logs          # Show all logs
-docker-compose logs -f       # Follow logs
-docker-compose logs <service> # Show specific service logs
+docker compose logs          # Show all logs
+docker compose logs -f       # Follow logs
+docker compose logs <service> # Show specific service logs
 
 # Shell access
-docker-compose exec backend sh   # Access backend container
-docker-compose exec postgres psql -U postgres -d alagist-local
-docker-compose exec redis redis-cli
+docker compose exec backend sh   # Access backend container
+docker compose exec postgres psql -U postgres -d alagist-local
+docker compose exec redis redis-cli
 
 # Cleanup
-docker-compose down -v       # Remove volumes
+docker compose down -v       # Remove volumes
 docker system prune          # Clean unused resources
 ```
 
@@ -443,38 +410,18 @@ chmod +x migration.sh
 ./server.sh stop             # Stop all services
 ./server.sh status           # Show service status
 
-# Package manager switching
-./server.sh switch-pnpm      # Switch to pnpm
-./server.sh switch-bun       # Switch to Bun
-
 # Development
 ./server.sh logs             # View backend logs
 ./server.sh build            # Rebuild backend
 ./server.sh clean            # Clean up everything
 ```
 
-## Dockerfiles
-
-The project includes two specialized Dockerfiles:
-
-- **`Dockerfile.bun`**: Optimized for Bun runtime with native TypeScript support (default)
-- **`Dockerfile.pnpm`**: Optimized for pnpm with tsx TypeScript execution (alternative)
-
-Both Dockerfiles include:
-
-- Hot reload capabilities
-- Volume mounting for development
-- System dependencies for native modules
-- Alpine Linux base for smaller image sizes
-
-**Note**: The default setup uses Bun. To switch to pnpm, edit the `docker-compose.yml` file and uncomment the pnpm dockerfile line.
-
 ## Support
 
 If you encounter issues:
 
 1. **Try the migration script first**: `./migration.sh generate-container` or `./migration.sh migrate-container`
-2. Check the logs: `docker-compose logs`
+2. Check the logs: `docker compose logs`
 3. Verify Docker is running: `docker system info`
 4. Check port availability
 5. Ensure sufficient disk space and memory
@@ -482,7 +429,7 @@ If you encounter issues:
 
 ---
 
-**Last Updated**: January 2025  
+**Last Updated**: December 2025  
 **Docker Version**: 20.10+  
 **Docker Compose**: 2.0+  
-**Migration Script**: Available (`./migration.sh`)
+**Migration Script**: Available [migration.sh](../scripts/migration.sh)

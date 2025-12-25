@@ -1,6 +1,6 @@
 import type { DbTransaction } from '@/config';
 import type { InsertUserDetails, UserDetails } from '../entities/userDetails.entity';
-import { BaseRepository } from './sample.repository';
+import { BaseRepository } from './base.repository';
 import { userDetails } from '../schema/schema';
 import { eq } from 'drizzle-orm';
 import { configDatabase } from '@/config';

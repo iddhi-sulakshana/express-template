@@ -137,18 +137,23 @@ import signinController from './controllers/signin.controller';
 ### Adding New Models
 
 1. **Update `src/database/schema/schema.ts`**
-2. **Generate and apply migrations**
-3. **Create entity in `src/database/entities/`**
-4. **Create repository in `src/database/repositories/`**
+2. **Add enums to `src/database/enums/` if applicable** (Enums must be in separate files)
+3. **Generate and apply migrations**
+4. **Create entity in `src/database/entities/`**
+5. **Create repository in `src/database/repositories/`**
 
-### Example: Adding a Product Model
+### Example: Adding a Product Model with Enum
 
 ```typescript
-// 1. Add to schema.ts
+// 1. Add enum to the enums.ts
+export const productStatusEnum = pgEnum('product_status', ['active', 'inactive']);
+
+// 2. Add to schema.ts
 export const products = pgTable('products', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),
+  status: productStatusEnum('status').notNull(),
   vendorId: uuid('vendor_id').references(() => vendors.id),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
@@ -174,23 +179,30 @@ export type NewProduct = InferInsertModel<typeof products>;
 
 ### Creating Repository
 
+All repositories must inherit from `BaseRepository` and support transactions.
+Base repository can be found in `src/database/repositories/base.repository.ts`
+
 ```typescript
 // src/database/repositories/product.repository.ts
 import { eq } from 'drizzle-orm';
 import { Database } from '../schema/schema';
 import { products } from '../schema/schema';
 import type { Product, NewProduct } from '../entities/product.entity';
+import { BaseRepository } from './';
+import { configDatabase, type DbTransaction } from '@/config';
 
-export class ProductRepository {
-  constructor(private db: Database) {}
+const db = configDatabase.db;
 
-  async create(data: NewProduct): Promise<Product> {
-    const [product] = await this.db.insert(products).values(data).returning();
+export class ProductRepository extends BaseRepository<Product, NewProduct> {
+  async create(data: NewProduct, tx?: DbTransaction): Promise<Product> {
+    const dbInstance = tx || db;
+    const [product] = await dbInstance.insert(products).values(data).returning();
     return product;
   }
 
-  async findById(id: string): Promise<Product | null> {
-    const [product] = await this.db.select().from(products).where(eq(products.id, id));
+  async findById(id: string, tx?: DbTransaction): Promise<Product | null> {
+    const dbInstance = tx || db;
+    const [product] = await dbInstance.select().from(products).where(eq(products.id, id));
     return product || null;
   }
 }
@@ -318,8 +330,8 @@ router.use('/products', productController);
 export default router;
 
 // Add to main modules index.ts
-import productRouter from './product';
-router.use('/api/v1', productRouter);
+import productModule from './product';
+app.use(`${PREFIX}/products`, productModule);
 ```
 
 ## API Endpoint Development
@@ -342,6 +354,7 @@ export interface ProductResponseDto {
 }
 
 export const createProductSchema = z.object({
+  userId: z.string(),
   name: z.string().min(1, 'Product name is required'),
   price: z.number().positive('Price must be positive'),
   description: z.string().optional(),
@@ -363,9 +376,14 @@ const productRepository = new ProductRepository();
 
 export async function createProductService(
   data: CreateProductRequestDto,
-  vendorId: string,
 ): Promise<DataResponse<ProductResponseDto>> {
-  const { name, price, description } = data;
+  const { userId, name, price, description } = data;
+
+  // Validate user details if needed
+  const user = await userRepository.findById(userId);
+  if (!user) {
+    throw new ApiError('User not found', HTTP_STATUS.NOT_FOUND);
+  }
 
   // Business logic validation
   if (price < 0) {
@@ -377,7 +395,7 @@ export async function createProductService(
     name,
     price,
     description,
-    vendorId,
+    vendorId: user.vendorId,
     status: 'ACTIVE',
   });
 
@@ -408,8 +426,11 @@ const router = Router();
 
 router.post('/', async (req: AuthRequest, res) => {
   try {
-    const data = await createProductSchema.parseAsync(req.body);
-    const response = await createProductService(data, req.user.id);
+    const data = await createProductSchema.parseAsync({
+      ...req.body,
+      userId: req.user.id,
+    });
+    const response = await createProductService(data);
     res.sendResponse(response);
   } catch (error: any) {
     res.sendResponse(error);
@@ -550,6 +571,7 @@ components:
 3. **Error Responses**: Document all possible error responses
 4. **Security**: Specify authentication requirements
 5. **Descriptions**: Write clear, detailed descriptions
+6. **Components**: If using components reuse them as much as possible by creating components.swagger.yaml
 
 ## Response Handling
 
@@ -615,20 +637,25 @@ Refer to the [Database Migration Guide](./MIGRATION_GUIDE.md) document
 // src/database/seed/products.seed.ts
 import { products } from '../schema/schema';
 import { Database } from '../schema/schema';
+import { ProductRepository } from '../repositories/product.repository';
+
+const productRepository = new ProductRepository();
+
+const defaultProducts: InsertProducts[] = [
+  {
+    name: 'Sample Product 1',
+    price: 19.99,
+    vendorId: 'vendor-id-1',
+  },
+  {
+    name: 'Sample Product 2',
+    price: 29.99,
+    vendorId: 'vendor-id-2',
+  },
+];
 
 export async function seedProducts(db: Database) {
-  await db.insert(products).values([
-    {
-      name: 'Sample Product 1',
-      price: 19.99,
-      vendorId: 'vendor-id-1',
-    },
-    {
-      name: 'Sample Product 2',
-      price: 29.99,
-      vendorId: 'vendor-id-2',
-    },
-  ]);
+  await productRepository.createMany(defaultProducts);
 }
 ```
 
@@ -649,7 +676,6 @@ Remember to always reference the auth module (`src/modules/auth/`) as the canoni
 For additional information and guides, refer to these related documents:
 
 - **[Requirements](./REQUIREMENTS.md)** - System requirements and dependencies
-- **[Database Schema](./DATABASE_SCHEMA.md)** - Complete database structure and relationships
 - **[Migration Guide](./MIGRATION_GUIDE.md)** - Database migration procedures and best practices
 - **[Docker Setup](./DOCKER_README.md)** - Docker configuration and deployment
 - **[Startup Guide](./STARTUP.md)** - Local development setup instructions

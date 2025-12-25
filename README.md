@@ -1,6 +1,6 @@
-# Alagist Server
+# Express TypeScript Template
 
-A modern TypeScript server built with Express.js, designed for high-performance backend services.
+A modern, production-ready TypeScript server template built with Express.js, designed for kickstarting high-performance backend services.
 
 ## 🛠️ Tech Stack
 
@@ -21,13 +21,13 @@ All source code for the application is organized within the `src` folder. Docume
 
 ## 📚 Documentation
 
-- [Coding Best Practices](./CODING_BEST_PRACTICES.md)
+- [Template Setup Instructions](./wiki/TEMPLATE_SETUP.md)
+- [Coding Best Practices](./wiki/CODING_BEST_PRACTICES.md)
 - [Requirements](./wiki/REQUIREMENTS.md)
 - [Setup Guide](./wiki/STARTUP.md)
 - [Docker Setup Guide](./wiki/DOCKER_README.md)
 - [Database Migration Guide](./wiki/MIGRATION_GUIDE.md)
-- [Database Schema](./wiki/DATABASE_SCHEMA.md)
 
 ## 📄 License
 
-This project is proprietary software..
+MIT

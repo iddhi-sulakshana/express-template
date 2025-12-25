@@ -75,7 +75,7 @@ type OutgoingHttpHeaders = {
 
 export interface DataResponse<T = undefined> {
   message: string;
-  data?: T;
+  data: T extends undefined ? undefined : T;
   pagination?: Pagination;
   status: HttpStatusCode;
   headers?: OutgoingHttpHeaders[];

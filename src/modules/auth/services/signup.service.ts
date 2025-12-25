@@ -26,8 +26,6 @@ export async function emailSignupService(
     email,
     passwordHash: hashedPassword,
     userType,
-    // TODO: Uncomment this when we have a verification email
-    // userStatus: 'PENDING',
     userStatus: 'ACTIVE',
   });
 

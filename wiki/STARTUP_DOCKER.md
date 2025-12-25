@@ -18,7 +18,7 @@ Start the complete stack including the backend service running in Docker.
 
 ```bash
 # Navigate to the project root directory
-cd alagist-server
+cd express-template
 
 # Make scripts executable (first time only)
 chmod +x scripts/server.sh scripts/migration.sh
@@ -47,7 +47,7 @@ chmod +x scripts/server.sh scripts/migration.sh
 [INFO] Starting all services (backend + databases)...
 [SUCCESS] All services started
 [INFO] Backend: http://localhost:3000
-[INFO] PostgreSQL: localhost:5434
+[INFO] PostgreSQL: localhost:5432
 [INFO] Redis: localhost:6379
 ```
 
@@ -82,7 +82,7 @@ nano .env  # or use your preferred editor
 
 - The database host is `postgres` and Redis host is `redis` (Docker service names) instead of `localhost`
 - Docker Compose automatically loads variables from `.env` file
-- Environment variables in `.env` will override the hardcoded values in `docker-compose.yml`
+- Environment variables in `.env` will override the hardcoded values in `docker compose.yml`
 
 ## Step 3: Run Database Migrations
 
@@ -115,14 +115,14 @@ Populate the database with initial data.
 
 ```bash
 # Run database seeding script in container
-docker-compose exec backend bun run scripts/seed-categories.js
+docker compose exec backend bun run db:seed
 ```
 
 **Verify Seeding:**
 
 ```bash
 # Check seeded data
-docker-compose exec dev-db psql -U postgres -d alagist-local -c "SELECT COUNT(*) FROM business_categories;"
+docker compose exec dev-db psql -U postgres -d system-local -c "SELECT COUNT(*) FROM business_categories;"
 ```
 
 ---
@@ -134,9 +134,10 @@ Once all services are running, you can access the application.
 **Service URLs:**
 
 - **Backend API**: http://localhost:3000
-- **Swagger Documentation**: http://localhost:3000/api-docs
+- **Swagger Documentation**: http://localhost:3000/swagger
+- **Scalar Documentation**: http://localhost:3000/scalar
 - **Health Check**: http://localhost:3000/api/v1/health
-- **PostgreSQL**: localhost:5434
+- **PostgreSQL**: localhost:5432
 - **Redis**: localhost:6379
 
 **Expected Backend Output:**
@@ -145,10 +146,8 @@ Once all services are running, you can access the application.
 🚧 Node running as Development Environment 🚧
 Environment Variables Loaded: /app/.env
 [INFO] : Redis connection established ✅
-[INFO] : Server listening on: http://localhost:3000
-[INFO] : Swagger UI: http://localhost:3000/api-docs
-[INFO] : API endpoint: http://localhost:3000/api/v1
 [INFO] : Database connected successfully ✅
+....
 ```
 
 ---
@@ -164,7 +163,7 @@ Verify everything is working correctly:
 ./scripts/server.sh status
 
 # Check if ports are listening
-netstat -tulpn | grep -E ':(3000|5434|6379)'
+netstat -tulpn | grep -E ':(3000|5432|6379)'
 ```
 
 ### 2. API Endpoints
@@ -174,7 +173,7 @@ netstat -tulpn | grep -E ':(3000|5434|6379)'
 curl http://localhost:3000/api/v1/health
 
 # Test Swagger documentation
-curl http://localhost:3000/api-docs
+curl http://localhost:3000/swagger
 ```
 
 ### 3. Backend Logs
@@ -184,7 +183,7 @@ curl http://localhost:3000/api-docs
 ./scripts/server.sh logs
 
 # Or view specific service logs
-docker-compose logs -f backend
+docker compose logs -f backend
 ```
 
 ---
@@ -241,7 +240,7 @@ docker-compose logs -f backend
 
 ### Hot Reload
 
-- Code changes in `src/` directory automatically restart the backend
+- Code changes in [src](../src) directory automatically restart the backend
 - Volume mounting ensures changes are reflected immediately
 - No need to rebuild the container for code changes
 
@@ -253,7 +252,7 @@ docker-compose logs -f backend
 
 ### Environment Variables
 
-- Docker Compose automatically loads variables from `.env` file in project root
+- Docker Compose automatically loads variables from [.env](../.env) file in project root
 - Database and Redis use Docker service names for networking
 - All environment variables are available in the container
 
@@ -281,7 +280,7 @@ sudo kill -9 <PID>
 
 ```bash
 # Check backend logs
-docker-compose logs backend
+docker compose logs backend
 
 # Rebuild backend service
 ./scripts/server.sh build
@@ -337,13 +336,13 @@ cat .env
 # Should use: postgres, redis (not localhost)
 
 # Check if Docker Compose is reading .env file
-docker-compose config
+docker compose config
 
 # Verify environment variables in running container
-docker-compose exec backend env | grep -E "(DATABASE_URL|REDIS_URL|JWT_SECRET)"
+docker compose exec backend env | grep -E "(DATABASE_URL|REDIS_URL|JWT_SECRET)"
 
 # Test environment variable substitution
-docker-compose config | grep -A 10 "environment:"
+docker compose config | grep -A 10 "environment:"
 ```
 
 ### Container Build Issues
@@ -356,7 +355,7 @@ docker system prune -f
 ./scripts/server.sh build
 
 # Check build logs
-docker-compose build backend
+docker compose build backend
 ```
 
 ---
@@ -400,11 +399,11 @@ Ctrl + C
 
 Once your Docker environment is running:
 
-1. **Explore the API**: Visit http://localhost:3000/api-docs
+1. **Explore the API**: Visit http://localhost:3000/swagger
 2. **Check Database**: Use `bun run db:studio` to explore your data
 3. **Monitor Logs**: Use `./scripts/server.sh logs` to monitor services
 4. **Read Documentation**: Review [Database Schema](./DATABASE_SCHEMA.md)
-5. **Start Coding**: Begin development in the `src/modules/` directory
+5. **Start Coding**: Begin development in the [src/modules/](../src/modules/) directory
 
 ---
 

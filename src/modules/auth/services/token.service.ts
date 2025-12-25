@@ -6,7 +6,6 @@ import { UserRepository } from '@/database/repositories';
 
 const userRepository = new UserRepository();
 
-// TODO: Add rate limiting to the refresh token endpoint
 export async function refreshTokenService(
   data: RefreshTokenDto,
 ): Promise<DataResponse<RefreshTokenResponseDto>> {

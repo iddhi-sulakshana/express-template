@@ -46,9 +46,9 @@ chmod +x scripts/server.sh scripts/migration.sh
 ```
 [INFO] Starting only database services...
 [SUCCESS] Database services started
-[INFO] PostgreSQL: localhost:5434
+[INFO] PostgreSQL: localhost:5432
 [INFO] Redis: localhost:6379
-[INFO] Run your backend locally with: bun run dev:bun
+[INFO] Run your backend locally with: bun run dev
 ```
 
 **Verify Services:**
@@ -110,8 +110,10 @@ bun run db:studio
 
 - `./scripts/migration.sh generate` - Creates migration files from schema changes
 - `./scripts/migration.sh migrate` - Applies pending migrations to database
+- `./scripts/migration.sh seed` - Applies pending migrations to database
 - `./scripts/migration.sh generate-container` - Generate migrations in Docker container
 - `./scripts/migration.sh migrate-container` - Run migrations in Docker container
+- `./scripts/migration.sh seed-container` - Run migrations in Docker container
 
 **Other Database Commands:**
 
@@ -125,14 +127,14 @@ Populate the database with initial data.
 
 ```bash
 # Run database seeding script
-bun run scripts/seed-categories.js
+./scripts/migration.sh seed
 ```
 
 **Verify Seeding:**
 
 ```bash
 # Check seeded data
-docker-compose exec postgres psql -U postgres -d alagist-local -c "SELECT COUNT(*) FROM business_categories;"
+docker compose exec postgres psql -U postgres -d system-local -c "SELECT COUNT(*) FROM business_categories;"
 ```
 
 ---
@@ -152,10 +154,8 @@ bun run dev
 🚧 Node running as Development Environment 🚧
 Environment Variables Loaded: /path/to/alagist-server/.env
 [INFO] : Redis connection established ✅
-[INFO] : Server listening on: http://localhost:3000
-[INFO] : Swagger UI: http://localhost:3000/api-docs
-[INFO] : API endpoint: http://localhost:3000/api/v1
 [INFO] : Database connected successfully ✅
+....
 ```
 
 ---
@@ -171,7 +171,7 @@ Verify everything is working correctly:
 ./scripts/server.sh status
 
 # Check if ports are listening
-netstat -tulpn | grep -E ':(3000|5434|6379)'
+netstat -tulpn | grep -E ':(3000|5432|6379)'
 ```
 
 ### 2. API Endpoints
@@ -181,7 +181,7 @@ netstat -tulpn | grep -E ':(3000|5434|6379)'
 curl http://localhost:3000/api/v1/health
 
 # Test Swagger documentation
-curl http://localhost:3000/api-docs
+curl http://localhost:3000/swagger
 ```
 
 ---
@@ -200,7 +200,7 @@ bun run dev
 
 ### Making Changes
 
-1. Edit your code in the `src/` directory
+1. Edit your code in the [src/](../src/) directory
 2. The server will automatically restart on file changes
 3. Check the console for any errors
 
@@ -243,6 +243,10 @@ sudo lsof -i :3000
 
 # Kill the process
 sudo kill -9 <PID>
+
+# or
+
+fuser -k 3000/tcp
 ```
 
 ### Database Connection Failed
@@ -299,10 +303,9 @@ cat .env
 
 Once your development environment is running:
 
-1. **Explore the API**: Visit http://localhost:3000/api-docs
+1. **Explore the API**: Visit http://localhost:3000/swagger
 2. **Check Database**: Use `bun run db:studio` to explore your data
-3. **Read Documentation**: Review [Database Schema](./DATABASE_SCHEMA.md)
-4. **Start Coding**: Begin development in the `src/modules/` directory
+3. **Start Coding**: Begin development in the [src/modules/](../src/modules/) directory
 
 ---
 
@@ -313,6 +316,6 @@ If you encounter issues:
 1. Check the [Requirements](./REQUIREMENTS.md) document
 2. Review [Docker Setup](./DOCKER_README.md) for detailed Docker configuration
 3. Check the troubleshooting section above
-4. Verify all services are running with `docker-compose ps`
+4. Verify all services are running with `docker compose ps`
 
 **Happy Coding! 🚀**

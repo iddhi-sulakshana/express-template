@@ -4,13 +4,13 @@ This guide explains how to apply and manage database migrations in the Alagist S
 
 ## Overview
 
-The project uses **Drizzle ORM** with **PostgreSQL** and **PostGIS** extension for handling database schema and migrations. All migration files are located in `src/database/migrations/`.
+The project uses **Drizzle ORM** with **PostgreSQL** and **PostGIS** extension for handling database schema and migrations. All migration files are located in [src/database/migrations/](../src/database/migrations/).
 
 ## Prerequisites
 
 1. **PostgreSQL Database** with PostGIS extension support
 2. **Environment Variables** configured (see Environment Setup section)
-3. **Dependencies** installed (`pnpm install`)
+3. **Dependencies** installed (`bun install`)
 
 ## Environment Setup
 
@@ -28,11 +28,10 @@ Using the provided Docker Compose setup (with PostGIS support):
 DATABASE_URL=postgresql://postgres:12345@localhost:5434/alagist-local
 ```
 
-**Important**: The Docker Compose uses `postgis/postgis:13-3.1` image which includes PostGIS extension.
+**Important**: The Docker Compose uses `postgres:17-alpine` image.
 
 ### Key Features
 
-- **PostGIS Integration** - Spatial data support for location-based features
 - **User Types** - Multi-role system with proper constraints
 - **Secure Authentication** - Token-based auth with device tracking
 - **Data Integrity** - Proper foreign key relationships and unique constraints
@@ -41,7 +40,7 @@ DATABASE_URL=postgresql://postgres:12345@localhost:5434/alagist-local
 
 ### 🚀 Easy Mode: Migration Script
 
-We provide a convenient `migration.sh` script for easy database management:
+We provide a convenient [migration.sh](../scripts/migration.sh) script for easy database management:
 
 ```bash
 # Make the script executable (first time only)
@@ -78,29 +77,29 @@ If you prefer to run commands manually or need more control:
 
 ```bash
 # Start PostgreSQL with Docker Compose
-docker-compose up -d postgres
+docker compose up -d postgres
 ```
 
 ### 2. Generate New Migration
 
-When you modify the schema in `src/database/schema/schema.ts`:
+When you modify the schema in [src/database/schema/schema.ts](../src/database/schema/schema.ts) or [src/database/schema/enums.ts](../src/database/schema/enums.ts):
 
 ```bash
 # Generate migration files based on schema changes
-pnpm run db:generate
+bun run db:generate
 ```
 
 This will:
 
 - Compare current schema with database state
-- Generate SQL migration files in `src/database/migrations/`
-- Update the migration journal in `meta/_journal.json`
+- Generate SQL migration files in [src/database/migrations/](../src/database/migrations/)
+- Update the migration journal in [\_journal.json](../src/database/migrations/meta/_journal.json)
 
 ### 3. Apply Migrations
 
 ```bash
 # Apply all pending migrations to the database
-pnpm run db:migrate
+bun run db:migrate
 ```
 
 This will:
@@ -115,7 +114,7 @@ For rapid development iteration:
 
 ```bash
 # Push schema changes directly without generating migration files
-pnpm run db:push
+bun run db:push
 ```
 
 ⚠️ **Warning**: This bypasses migration files and should only be used in development.
@@ -124,49 +123,26 @@ pnpm run db:push
 
 ```bash
 # Open Drizzle Studio for database exploration
-pnpm run db:studio
+bun run db:studio
 ```
-
-## Current Migration Status
-
-The project currently has two migrations:
-
-- **0000_medical_lady_vermin.sql** - Initial migration that enables PostGIS extension
-- **0001_aberrant_cannonball.sql** - Main schema migration with all tables and relationships
-
-### Migration 0000: PostGIS Extension
-
-```sql
--- Custom SQL migration file, put your code below! --
-CREATE EXTENSION postgis;
-```
-
-### Migration 0001: Database Schema
-
-Contains all the main database tables:
-
-- User management tables (users, user_details, user_locations)
-- Authentication tables (tokens, token_details, user_otps)
-- PostGIS spatial support for location data
-- Proper foreign key relationships and constraints
 
 ## Migration Workflow
 
 ### For Schema Changes
 
-1. **Modify Schema**: Update `src/database/schema/schema.ts`
-2. **Generate Migration**: Run `pnpm run db:generate`
-3. **Review Migration**: Check generated SQL in `src/database/migrations/`
-4. **Apply Migration**: Run `pnpm run db:migrate`
+1. **Modify Schema**: Update [src/database/schema/schema.ts](../src/database/schema/schema.ts) or [src/database/schema/enums.ts](../src/database/schema/enums.ts)
+2. **Generate Migration**: Run `bun run db:generate`
+3. **Review Migration**: Check generated SQL in [src/database/migrations/](../src/database/migrations/)
+4. **Apply Migration**: Run `bun run db:migrate`
 5. **Test**: Verify changes work as expected
 
 ### For Custom SQL
 
 If you need custom SQL (like extensions, functions, triggers):
 
-1. **Generate Base Migration**: Run `pnpm run db:generate`
+1. **Generate Base Migration**: Run `bun run db:generate`
 2. **Edit Migration File**: Add custom SQL to the generated file
-3. **Apply Migration**: Run `pnpm run db:migrate`
+3. **Apply Migration**: Run `bun run db:migrate`
 
 ## Production Deployment
 
@@ -186,7 +162,7 @@ If you need custom SQL (like extensions, functions, triggers):
    ```
 3. **Apply Migrations**
    ```bash
-   pnpm run db:migrate
+   bun run db:migrate
    ```
 4. **Verify Migration Success**
    ```bash
@@ -204,7 +180,7 @@ If you need custom SQL (like extensions, functions, triggers):
 
 ```bash
 # Check database connection
-pnpm run dev
+bun run dev
 # Look for database connection logs
 ```
 
@@ -214,76 +190,10 @@ If database schema doesn't match your code:
 
 ```bash
 # Generate migration to sync
-pnpm run db:generate
+bun run db:generate
 
 # Or push directly (development only)
-pnpm run db:push
-```
-
-#### PostGIS Extension Missing
-
-**Error**: `could not open extension control file "/usr/share/postgresql/13/extension/postgis.control"`
-
-**Solution**: Use a PostgreSQL image that includes PostGIS:
-
-```yaml
-# docker-compose.yml
-services:
-  postgres:
-    image: postgis/postgis:13-3.1 # ← Use PostGIS image, not postgres:13
-    # ... rest of config
-```
-
-Then restart your database:
-
-```bash
-docker-compose down
-docker-compose up -d postgres
-```
-
-**Check PostGIS availability**:
-
-```sql
--- Check if PostGIS is available
-SELECT * FROM pg_available_extensions WHERE name = 'postgis';
-
--- Install PostGIS (requires superuser)
-CREATE EXTENSION postgis;
-```
-
-#### Connection Issues
-
-Verify your `DATABASE_URL` format:
-
-```
-postgresql://username:password@host:port/database_name
-```
-
-### Migration Journal
-
-The migration state is tracked in `src/database/migrations/meta/_journal.json`:
-
-```json
-{
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1755366154769,
-      "tag": "0000_medical_lady_vermin",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1755366890391,
-      "tag": "0001_aberrant_cannonball",
-      "breakpoints": true
-    }
-  ]
-}
+bun run db:push
 ```
 
 ## Best Practices
@@ -293,7 +203,6 @@ The migration state is tracked in `src/database/migrations/meta/_journal.json`:
 1. **Use Proper Types**: Leverage PostgreSQL-specific types (UUID, ENUM, etc.)
 2. **Add Constraints**: Use unique constraints and foreign keys for data integrity
 3. **Index Strategically**: Add indexes for frequently queried columns
-4. **Spatial Data**: Use PostGIS for location-based features
 
 ### Migration Management
 
@@ -312,7 +221,7 @@ The migration state is tracked in `src/database/migrations/meta/_journal.json`:
 
 ## Configuration Files
 
-### Drizzle Config (`drizzle.config.ts`)
+### Drizzle Config ([drizzle.config.ts](../drizzle.config.ts))
 
 ```typescript
 export default defineConfig({
@@ -327,15 +236,7 @@ export default defineConfig({
 });
 ```
 
-### Database Config (`src/config/database.config.ts`)
-
-```typescript
-// Drizzle instance for application use
-export const db = drizzle(client);
-
-// Raw client for migrations
-export { client };
-```
+### Database Config for application use ([src/config/database.config.ts](../src/config/database.config.ts))
 
 ## Useful Commands Reference
 
@@ -361,19 +262,19 @@ chmod +x migration.sh
 
 ```bash
 # Database Management
-docker-compose up -d postgres           # Start local database
-docker-compose down                   # Stop local database
+docker compose up -d postgres           # Start local database
+docker compose down                   # Stop local database
 
 # Migration Commands
-pnpm run db:generate                  # Generate migration from schema
-pnpm run db:migrate                   # Apply pending migrations
-pnpm run db:push                      # Push schema (dev only)
-pnpm run db:studio                    # Open database GUI
+bun run db:generate                  # Generate migration from schema
+bun run db:migrate                   # Apply pending migrations
+bun run db:push                      # Push schema (dev only)
+bun run db:studio                    # Open database GUI
 
 # Application Commands
-pnpm run dev                          # Start development server
-pnpm run build                        # Build for production
-pnpm run start                        # Start production server
+bun run dev                          # Start development server
+bun run build                        # Build for production
+bun run start                        # Start production server
 ```
 
 ## Support
@@ -388,7 +289,6 @@ If you encounter issues with migrations:
 
 ---
 
-**Last Updated**: January 2025  
+**Last Updated**: December 2025  
 **Drizzle Version**: 0.31.4  
-**PostgreSQL Version**: 13+  
-**PostGIS Required**: Yes
+**PostgreSQL Version**: 13+

@@ -72,7 +72,7 @@ Docker is required for running PostgreSQL and Redis services.
 sudo apt update
 
 # Install Docker
-sudo apt install docker.io docker-compose
+sudo apt install docker.io docker compose
 
 # Start Docker service
 sudo systemctl start docker
@@ -87,7 +87,7 @@ sudo usermod -aG docker $USER
 
 ```bash
 # Install using Homebrew
-brew install docker docker-compose
+brew install docker docker compose
 
 # Or download Docker Desktop from: https://www.docker.com/products/docker-desktop
 ```
@@ -102,7 +102,7 @@ brew install docker docker-compose
 
 ```bash
 docker --version        # Should show Docker version 20.10+
-docker-compose --version # Should show docker-compose version 1.29+
+docker compose --version # Should show docker compose version 1.29+
 ```
 
 ### 3. Git
@@ -171,14 +171,14 @@ The project uses the following Docker services:
 
 > **Note:** Please ensure the following ports are free and not used by other applications, as they are required for the services to run:
 >
-> - **5434**: PostgreSQL with PostGIS
+> - **5432**: PostgreSQL with PostGIS
 > - **6379**: Redis
 > - **3000**: Backend server
 
 ### PostgreSQL with PostGIS
 
-- **Image**: `postgis/postgis`
-- **Port**: `5434` (mapped from container's 5432)
+- **Image**: `postgres:17-alpine`
+- **Port**: `5432` (mapped from container's 5432)
 - **Database**: `alagist-local`
 - **User**: `postgres`
 - **Password**: `12345`
@@ -199,7 +199,7 @@ bun --version
 
 # Check Docker
 docker --version
-docker-compose --version
+docker compose --version
 
 # Check Git
 git --version
@@ -208,7 +208,7 @@ git --version
 docker run hello-world
 
 # Check if ports are available
-netstat -tulpn | grep -E ':(3000|5434|6379)'
+netstat -tulpn | grep -E ':(3000|5432|6379)'
 ```
 
 ## 🚨 Common Issues & Solutions
@@ -226,7 +226,7 @@ sudo usermod -aG docker $USER
 ```bash
 # Find process using port
 sudo lsof -i :3000
-sudo lsof -i :5434
+sudo lsof -i :5432
 sudo lsof -i :6379
 
 # Kill process if needed
