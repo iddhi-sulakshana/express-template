@@ -1,6 +1,6 @@
 # Database Migration Guide
 
-This guide explains how to apply and manage database migrations in the Alagist Server project using Drizzle ORM.
+This guide explains how to apply and manage database migrations in the Server project using Drizzle ORM.
 
 ## Overview
 
@@ -25,7 +25,7 @@ DATABASE_URL=postgresql://username:password@host:port/database_name
 Using the provided Docker Compose setup (with PostGIS support):
 
 ```env
-DATABASE_URL=postgresql://postgres:12345@localhost:5434/alagist-local
+DATABASE_URL=postgresql://postgres:12345@localhost:5434/system-local
 ```
 
 **Important**: The Docker Compose uses `postgres:17-alpine` image.

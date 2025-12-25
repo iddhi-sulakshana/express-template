@@ -1,6 +1,6 @@
 # Requirements & Prerequisites
 
-This document outlines all the software and tools required to run the Alagist Server project.
+This document outlines all the software and tools required to run the Server project.
 
 ## 📋 System Requirements
 
@@ -179,7 +179,7 @@ The project uses the following Docker services:
 
 - **Image**: `postgres:17-alpine`
 - **Port**: `5432` (mapped from container's 5432)
-- **Database**: `alagist-local`
+- **Database**: `system-local`
 - **User**: `postgres`
 - **Password**: `12345`
 

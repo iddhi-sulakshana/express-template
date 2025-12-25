@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Database Migration Script for Alagist Server
+# Database Migration Script
 # Usage: ./migration.sh [command] [option]
 
 set -e

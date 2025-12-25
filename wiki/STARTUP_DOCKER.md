@@ -1,6 +1,6 @@
 # Docker Startup Guide
 
-This guide covers running the entire Alagist Server stack using Docker, including the backend service running in a container.
+This guide covers running the entire Server stack using Docker, including the backend service running in a container.
 
 ## 🚀 Quick Start Overview
 
@@ -372,7 +372,7 @@ docker compose build backend
 ./scripts/server.sh start-db
 
 # Update .env for local development
-# Change DATABASE_URL to: postgresql://postgres:12345@localhost:5434/alagist-local
+# Change DATABASE_URL to: postgresql://postgres:12345@localhost:5434/system-local
 # Change REDIS_URL to: redis://localhost:6379
 
 # Run backend locally
@@ -386,7 +386,7 @@ bun run dev
 Ctrl + C
 
 # Update .env for Docker development
-# Change DATABASE_URL to: postgresql://postgres:12345@postgres:5432/alagist-local
+# Change DATABASE_URL to: postgresql://postgres:12345@postgres:5432/system-local
 # Change REDIS_URL to: redis://redis:6379
 
 # Start all services

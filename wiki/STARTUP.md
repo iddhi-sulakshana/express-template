@@ -1,6 +1,6 @@
 # Startup Guide
 
-This guide will walk you through the complete process of setting up and running the Alagist Server project from scratch.
+This guide will walk you through the complete process of setting up and running the Server project from scratch.
 
 ## 🚀 Quick Start Overview
 
@@ -19,7 +19,7 @@ First, start the required database services using the project's server script.
 
 ```bash
 # Navigate to the project root directory
-cd alagist-server
+cd express-template
 
 # Make scripts executable (first time only)
 chmod +x scripts/server.sh scripts/migration.sh
@@ -152,7 +152,7 @@ bun run dev
 
 ```
 🚧 Node running as Development Environment 🚧
-Environment Variables Loaded: /path/to/alagist-server/.env
+Environment Variables Loaded: /path/to/express-template/.env
 [INFO] : Redis connection established ✅
 [INFO] : Database connected successfully ✅
 ....

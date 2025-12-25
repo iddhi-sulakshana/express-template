@@ -1,6 +1,6 @@
 # Docker Setup Guide
 
-This guide explains how to set up and run the Alagist server using Docker.
+This guide explains how to set up and run the server using Docker.
 
 ## Prerequisites
 
@@ -291,8 +291,8 @@ The backend service supports hot reload for seamless development:
 ### 1. First Time Setup
 
 ```bash
-# Clone repository and navigate to project
-cd alagist-server
+# Navigate to project
+cd express-template
 
 # Start all services (backend + databases)
 docker compose up -d
@@ -379,7 +379,7 @@ docker compose logs <service> # Show specific service logs
 
 # Shell access
 docker compose exec backend sh   # Access backend container
-docker compose exec postgres psql -U postgres -d alagist-local
+docker compose exec postgres psql -U postgres -d system-local
 docker compose exec redis redis-cli
 
 # Cleanup

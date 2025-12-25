@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Docker Development Script for Alagist Server
+# Docker Development Script
 # Usage: ./server.sh [command]
 
 set -e

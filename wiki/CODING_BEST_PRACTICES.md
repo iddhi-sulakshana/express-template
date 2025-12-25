@@ -1,6 +1,6 @@
 # Coding Best Practices Guide
 
-This document outlines the coding standards and best practices to follow when developing in the Alagist codebase. All developers must adhere to these guidelines to maintain code quality, consistency, and prevent breaking changes.
+This document outlines the coding standards and best practices to follow when developing in the codebase. All developers must adhere to these guidelines to maintain code quality, consistency, and prevent breaking changes.
 
 ## Table of Contents
 
